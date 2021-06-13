@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UtenteDaoTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.model.interfaces</a> &gt; <span class="el_source">UtenteDaoTest.java</span></div><h1>UtenteDaoTest.java</h1><pre class="source lang-java linenums">package classes.model.interfaces;
+
+import classes.model.bean.entity.UtenteBean;
+import classes.model.dao.UtenteModel;
+import org.junit.jupiter.api.Test;
+
+import java.sql.Date;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="fc" id="L15">class UtenteDaoTest {</span>
+<span class="fc" id="L16">    private UtenteModel utenteModel = new UtenteModel();</span>
+<span class="fc" id="L17">    private UtenteBean utenteBean = new UtenteBean();</span>
+
+    @Test
+    void doRetrieveByKey() throws SQLException {
+<span class="fc" id="L21">        assertNotNull(utenteModel.doRetrieveByKey(&quot;MNDCMN97R22A509S&quot;));</span>
+<span class="fc" id="L22">    }</span>
+
+    @Test
+    void doRetrieveAll() throws SQLException {
+<span class="fc" id="L26">        assertNotNull(utenteModel.doRetrieveAll(&quot;&quot;));</span>
+<span class="fc" id="L27">        assertNotNull(utenteModel.doRetrieveAll(&quot;nome&quot;));</span>
+<span class="fc" id="L28">    }</span>
+
+    @Test
+    void doSave() throws SQLException {
+<span class="fc" id="L32">        utenteBean.setEmail(&quot;thisProva@prova.it&quot;);</span>
+<span class="fc" id="L33">        utenteBean.setNome(&quot;Provino&quot;);</span>
+<span class="fc" id="L34">        utenteBean.setCognome(&quot;Prova&quot;);</span>
+<span class="fc" id="L35">        utenteBean.setPassword(&quot;Prova1!&quot;);</span>
+<span class="fc" id="L36">        utenteBean.setCodiceFiscale(&quot;CPHMKL98H41I490J&quot;);</span>
+<span class="fc" id="L37">        utenteBean.setNumeroDiTelefono(&quot;3271219447&quot;);</span>
+<span class="fc" id="L38">        DateFormat df = new SimpleDateFormat(&quot;MM-dd-yyyy&quot;);</span>
+<span class="fc" id="L39">        Date date = null;</span>
+        try {
+<span class="fc" id="L41">            date = new Date(df.parse(&quot;02-04-1981&quot;).getTime());</span>
+<span class="nc" id="L42">        } catch (ParseException e) {</span>
+<span class="nc" id="L43">            e.printStackTrace();</span>
+<span class="fc" id="L44">        }</span>
+<span class="fc" id="L45">        utenteBean.setDataDiNascita(date);</span>
+<span class="fc" id="L46">        utenteModel.doSave(utenteBean);</span>
+<span class="fc" id="L47">    }</span>
+
+    @Test
+    void doUpdate() throws SQLException {
+<span class="fc" id="L51">        utenteBean = utenteModel.doRetrieveByKey(&quot;CRLNTN92S15H703Q&quot;);</span>
+<span class="fc" id="L52">        utenteBean.setNome(&quot;Tony&quot;);</span>
+<span class="fc" id="L53">        utenteModel.doUpdate(utenteBean);</span>
+<span class="fc" id="L54">    }</span>
+
+    @Test
+    void doDelete() throws SQLException {
+<span class="fc" id="L58">        utenteBean = utenteModel.doRetrieveByKey(&quot;CPHMKL98H41I490J&quot;);</span>
+<span class="fc" id="L59">        utenteModel.doDelete(utenteBean);</span>
+<span class="fc" id="L60">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

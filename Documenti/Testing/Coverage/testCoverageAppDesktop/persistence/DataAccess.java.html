@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataAccess.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">AppDesktopMedQueue$All_in_AppDesktopMedQueue.exec</a> &gt; <a href="index.source.html" class="el_package">persistence</a> &gt; <span class="el_source">DataAccess.java</span></div><h1>DataAccess.java</h1><pre class="source lang-java linenums">package persistence;
+
+import bean.ImpiegatoBean;
+import bean.OperazioneBean;
+import bean.PrenotazioneBean;
+import bean.StrutturaBean;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Time;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+/** Classe che permette operazioni sul database. */
+public class DataAccess implements DaoInterface {
+
+  /** Costruttore vuoto. */
+<span class="fc" id="L18">  public DataAccess() {}</span>
+
+  /**
+   * Metodo che ci permettere di ottenere una prenotazione dal database in base all'id.
+   *
+   * &lt;p&gt;
+   *     Pre-condizione: id&gt;0
+   *     Post-condizione: Prenotazione-&gt;select(p|p.id=id)
+   * &lt;/p&gt;
+   *
+   * @param id id della prenotazione che si vuole prelevare dalla collezione Prenotazione
+   * @return ritorna la prenotazione oppure null se non è presente nel database
+   */
+  public PrenotazioneBean getPrenotazione(int id) {
+<span class="fc" id="L32">    PrenotazioneBean prenotazione = null;</span>
+<span class="fc" id="L33">    Connection con = null;</span>
+    try {
+<span class="fc" id="L35">      String sql = &quot;SELECT * FROM MedQueue.Prenotazione WHERE Prenotazione.Id = ?&quot;;</span>
+<span class="fc" id="L36">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L37">      PreparedStatement query = con.prepareStatement(sql);</span>
+<span class="fc" id="L38">      query.setInt(1, id);</span>
+<span class="fc" id="L39">      ResultSet rs = query.executeQuery();</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L41">        prenotazione = new PrenotazioneBean();</span>
+<span class="fc" id="L42">        prenotazione.setId(rs.getInt(1));</span>
+<span class="fc" id="L43">        prenotazione.setData(rs.getDate(2));</span>
+<span class="fc" id="L44">        Long tmp=rs.getTime(3).getTime();</span>
+<span class="fc" id="L45">        String time = String.format(&quot;%02d:%02d:%02d&quot;, (tmp / (1000 * 60 * 60)) % 24, (tmp/ (1000 * 60)) % 60, (tmp / 1000) % 60);</span>
+<span class="fc" id="L46">        prenotazione.setTime(Time.valueOf(time));</span>
+<span class="fc" id="L47">        prenotazione.setConvalida(rs.getBoolean(4));</span>
+<span class="fc" id="L48">        prenotazione.setCodiceFiscale(rs.getString(5));</span>
+<span class="fc" id="L49">        prenotazione.setIdOperazione(rs.getInt(6));</span>
+<span class="fc" id="L50">        prenotazione.setIdStruttura(rs.getInt(7));</span>
+<span class="fc" id="L51">      }</span>
+<span class="fc" id="L52">      rs.close();</span>
+<span class="fc" id="L53">      query.close();</span>
+<span class="fc" id="L54">      con.close();</span>
+<span class="nc" id="L55">    } catch (SQLException e) {</span>
+<span class="nc" id="L56">      e.printStackTrace();</span>
+<span class="nc" id="L57">      System.err.println(&quot;SQLException:&quot; + e.getMessage());</span>
+<span class="fc" id="L58">    }</span>
+<span class="fc" id="L59">    return prenotazione;</span>
+  }
+
+  /**
+   * Metodo che ci permette di ottenere una struttura ospedaliera dal database in base all'id.
+   *
+   * &lt;p&gt;
+   *     Pre-condizione: id&gt;0
+   *     Post-condizione: Struttura-&gt;select(s|s.id==id)
+   * &lt;/p&gt;
+   *
+   * @param id id della struttura ospedaliera che si vuole prelevare dalla collezione Struttura
+   * @return ritorna la struttura ospedaliera oppure null se non è presente nel database
+   */
+  public StrutturaBean getStruttura(int id) {
+<span class="fc" id="L74">    StrutturaBean struttura = null;</span>
+<span class="fc" id="L75">    Connection con = null;</span>
+    try {
+<span class="fc" id="L77">      String sql = &quot;SELECT * FROM MedQueue.Struttura WHERE Struttura.Id = ?&quot;;</span>
+<span class="fc" id="L78">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L79">      PreparedStatement query = con.prepareStatement(sql);</span>
+<span class="fc" id="L80">      query.setInt(1, id);</span>
+<span class="fc" id="L81">      ResultSet rs = query.executeQuery();</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L83">        struttura = new StrutturaBean();</span>
+<span class="fc" id="L84">        struttura.setId(rs.getInt(1));</span>
+<span class="fc" id="L85">        struttura.setNome(rs.getString(2));</span>
+<span class="fc" id="L86">        struttura.setIndirizzo(rs.getString(3));</span>
+<span class="fc" id="L87">        struttura.setNumeroDiTelefono(rs.getString(4));</span>
+      }
+<span class="fc" id="L89">      query.close();</span>
+<span class="fc" id="L90">      rs.close();</span>
+<span class="fc" id="L91">      con.close();</span>
+<span class="nc" id="L92">    } catch (SQLException e) {</span>
+<span class="nc" id="L93">      e.printStackTrace();</span>
+<span class="nc" id="L94">      System.err.println(&quot;SQLException:&quot; + e.getMessage());</span>
+<span class="fc" id="L95">    }</span>
+<span class="fc" id="L96">    return struttura;</span>
+  }
+
+  /**
+   * Metodo che ci permette di ottenere un operazione per cui l'utente si puo prenotare in base
+   * all'id.
+   *
+   * &lt;p&gt;
+   *     Pre-condizione: id&gt;o
+   *     Post-condizione: Operazione-&gt;select(o|o.id==id)
+   * &lt;/p&gt;
+   *
+   * @param id id dell'operazione che si vuole prelevare dalla collezione Operazione
+   * @return ritorna l'operazione
+   */
+  public OperazioneBean getOperazione(int id) {
+<span class="fc" id="L112">    OperazioneBean operazione = null;</span>
+<span class="fc" id="L113">    Connection con = null;</span>
+    try {
+<span class="fc" id="L115">      String sql = &quot;SELECT * FROM MedQueue.Operazione WHERE Operazione.Id = ?&quot;;</span>
+<span class="fc" id="L116">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L117">      PreparedStatement query = con.prepareStatement(sql);</span>
+<span class="fc" id="L118">      query.setInt(1, id);</span>
+<span class="fc" id="L119">      ResultSet rs = query.executeQuery();</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L121">        operazione = new OperazioneBean();</span>
+<span class="fc" id="L122">        operazione.setId(rs.getInt(1));</span>
+<span class="fc" id="L123">        operazione.setTipoOperazione(rs.getString(2));</span>
+<span class="fc" id="L124">        operazione.setDescrizione(rs.getString(3));</span>
+      }
+<span class="fc" id="L126">      query.close();</span>
+<span class="fc" id="L127">      rs.close();</span>
+<span class="fc" id="L128">      con.close();</span>
+<span class="nc" id="L129">    } catch (SQLException e) {</span>
+<span class="nc" id="L130">      e.printStackTrace();</span>
+<span class="nc" id="L131">      System.err.println(&quot;SQLException:&quot; + e.getMessage());</span>
+<span class="fc" id="L132">    }</span>
+<span class="fc" id="L133">    return operazione;</span>
+  }
+
+  /**
+   * Metodo che restituisce un impiegato di una struttura ospedaliera in base al codice fiscale.
+   *
+   * &lt;p&gt;
+   *     Pre-condizione: codicefiscale!=null AND codicefiscale.lenght==16
+   *     Post-condizione: Impiegato-&gt;select(i!i.codicefiscale==codicefiscale);
+   * &lt;/p&gt;
+   *
+   * @param codicefiscale codice fiscale dell'impiegato che si vuole prelevare dalla collezione
+   *     Impiegato
+   * @return ritorna l'impiegato ospedaliero
+   */
+  public ImpiegatoBean getImpiegato(String codicefiscale) {
+<span class="fc" id="L149">    ImpiegatoBean impiegato = null;</span>
+<span class="fc" id="L150">    Connection con = null;</span>
+    try {
+<span class="fc" id="L152">      String sql = &quot;SELECT * FROM MedQueue.Impiegato WHERE Impiegato.codiceFiscale = ?&quot;;</span>
+<span class="fc" id="L153">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L154">      PreparedStatement query = con.prepareStatement(sql);</span>
+<span class="fc" id="L155">      query.setString(1, codicefiscale);</span>
+<span class="fc" id="L156">      ResultSet rs = query.executeQuery();</span>
+<span class="fc bfc" id="L157" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L158">        impiegato = new ImpiegatoBean();</span>
+<span class="fc" id="L159">        impiegato.setCodicefiscale(rs.getString(1));</span>
+<span class="fc" id="L160">        impiegato.setPassword(rs.getString(2));</span>
+<span class="fc" id="L161">        impiegato.setNome(rs.getString(3));</span>
+<span class="fc" id="L162">        impiegato.setCognome(rs.getString(4));</span>
+<span class="fc" id="L163">        impiegato.setDataDiNascita(rs.getDate(5));</span>
+<span class="fc" id="L164">        impiegato.setIndirizzoEmail(rs.getString(6));</span>
+<span class="fc" id="L165">        impiegato.setNumeroDiTelefono(rs.getString(7));</span>
+<span class="fc" id="L166">        impiegato.setIdStruttura(Integer.parseInt(rs.getString(8)));</span>
+      }
+<span class="fc" id="L168">      query.close();</span>
+<span class="fc" id="L169">      rs.close();</span>
+<span class="fc" id="L170">      con.close();</span>
+<span class="nc" id="L171">    } catch (SQLException e) {</span>
+<span class="nc" id="L172">      e.printStackTrace();</span>
+<span class="nc" id="L173">      System.err.println(&quot;SQLException:&quot; + e.getMessage());</span>
+<span class="fc" id="L174">    }</span>
+<span class="fc" id="L175">    return impiegato;</span>
+  }
+
+  /**
+   * Metodo che restituisce tutte le operazioni per cui è possibile prenotarsi.
+   *
+   * &lt;p&gt;
+   *     Post-condizione: Operazioni-&gt;asSet(Operazioni)
+   * &lt;/p&gt;
+   *
+   * @return ritorna una lista di operazioni
+   */
+  public ArrayList&lt;OperazioneBean&gt; getOperazioni() {
+<span class="fc" id="L188">    ArrayList&lt;OperazioneBean&gt; operazioni = new ArrayList&lt;OperazioneBean&gt;();</span>
+<span class="fc" id="L189">    Connection con = null;</span>
+    try {
+<span class="fc" id="L191">      String sql = &quot;SELECT * FROM MedQueue.Operazione&quot;;</span>
+<span class="fc" id="L192">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L193">      PreparedStatement query = con.prepareStatement(sql);</span>
+<span class="fc" id="L194">      ResultSet rs = query.executeQuery();</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L196">        operazioni.add(new OperazioneBean(rs.getInt(1), rs.getString(2), rs.getString(3)));</span>
+      }
+<span class="fc" id="L198">      query.close();</span>
+<span class="fc" id="L199">      rs.close();</span>
+<span class="fc" id="L200">      con.close();</span>
+<span class="nc" id="L201">    } catch (SQLException e) {</span>
+<span class="nc" id="L202">      e.printStackTrace();</span>
+<span class="nc" id="L203">      System.err.println(&quot;SQLException:&quot; + e.getMessage());</span>
+<span class="fc" id="L204">    }</span>
+
+<span class="fc" id="L206">    return operazioni;</span>
+  }
+
+  /**
+   * Metodo per cancellare una prenotazione dal database in base all'id.
+   *
+   * &lt;p&gt;
+   *     Pre-condizione: id&gt;0
+   *     Post-condizione: !Prenotazione-&gt;exists(p|p.id==id)
+   * &lt;/p&gt;
+   *
+   * @param id id della prenotazione della collezione prenotazione da cancellare
+   * @return 0 se la prenotazione non è stata cancellata, 1 se la prenotazione è stata cancellata
+   */
+  public int deletePrenotazione(int id) {
+<span class="fc" id="L221">    int delete = 0;</span>
+<span class="fc" id="L222">    Connection con = null;</span>
+    try {
+<span class="fc" id="L224">      String sql = &quot;DELETE Prenotazione FROM MedQueue.Prenotazione WHERE Prenotazione.Id = ?&quot;;</span>
+<span class="fc" id="L225">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L226">      PreparedStatement query = con.prepareStatement(sql);</span>
+<span class="fc" id="L227">      query.setInt(1, id);</span>
+<span class="fc" id="L228">      delete = query.executeUpdate();</span>
+<span class="fc" id="L229">      query.close();</span>
+<span class="fc" id="L230">      con.close();</span>
+<span class="nc" id="L231">    } catch (SQLException e) {</span>
+<span class="nc" id="L232">      e.printStackTrace();</span>
+<span class="nc" id="L233">      System.err.println(&quot;SQLException:&quot; + e.getMessage());</span>
+<span class="fc" id="L234">    }</span>
+<span class="fc" id="L235">    return delete;</span>
+  }
+
+  /**
+   * Metodo che restituisce il numero di prenotazioni convalidate in base all'id dell'oprazione e
+   * l'id della struttura.
+   *
+   * &lt;p&gt;Pre-condizione: idOperazione&gt;0 AND idStruttura&gt;0
+   * Post-condizione: Prenotazione-&gt;exists(p|p.idStruttura==idStruttura AND
+   * p.idOperazione==idOperazione AND p.convalida==true).size()&lt;/p&gt;
+   *
+   * @param idOperazione id dell'operazione della collezione Operazione
+   * @param idStruttura id della struttura della collezione Struttura
+   * @return numero prenotazioni convalidate
+   */
+  public int numPrenotazioni(int idOperazione, int idStruttura) {
+<span class="fc" id="L251">    int count = 0;</span>
+<span class="fc" id="L252">    Connection con = null;</span>
+    try {
+<span class="fc" id="L254">      String sql =</span>
+          &quot;SELECT * FROM MedQueue.Prenotazione WHERE Prenotazione.convalida = 1 &quot;
+              + &quot;AND Prenotazione.idOperazione = ?&quot;
+              + &quot; AND Prenotazione.idStruttura = ?&quot;;
+<span class="fc" id="L258">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L259">      PreparedStatement query = con.prepareStatement(sql);</span>
+<span class="fc" id="L260">      query.setInt(1, idOperazione);</span>
+<span class="fc" id="L261">      query.setInt(2, idStruttura);</span>
+<span class="fc" id="L262">      ResultSet rs = query.executeQuery();</span>
+<span class="fc bfc" id="L263" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L264">        count++;</span>
+      }
+<span class="fc" id="L266">      query.close();</span>
+<span class="fc" id="L267">      rs.close();</span>
+<span class="fc" id="L268">      con.close();</span>
+<span class="nc" id="L269">    } catch (SQLException e) {</span>
+<span class="nc" id="L270">      e.printStackTrace();</span>
+<span class="nc" id="L271">      System.err.println(&quot;SQLException:&quot; + e.getMessage());</span>
+<span class="fc" id="L272">    }</span>
+<span class="fc" id="L273">    return count;</span>
+  }
+
+  /**
+   * Metodo che restituisce la prima operazione da servire in base all'ora della prenotazione.
+   *
+   * &lt;p&gt;Pre-condizione: idStruttura&gt;0 AND idOperazione&gt;0
+   * Post-condizione: Prenotazione-&gt;select(p|p.idStruttura==idStruttura AND
+   * p.idOperazione==idOperazione AND p.convalida==true)&lt;/p&gt;
+   *
+   * @param idOperazione id dell'operazione della collezione Operazione
+   * @param idStruttura id della struttura della collezione Struttura
+   * @return prenotazione da servire
+   */
+  public PrenotazioneBean serviPrenotazione(int idOperazione, int idStruttura) {
+<span class="fc" id="L288">    PrenotazioneBean prenotazione = null;</span>
+<span class="fc" id="L289">    Connection con = null;</span>
+    try {
+<span class="fc" id="L291">      String sql =</span>
+          &quot;SELECT * FROM MedQueue.Prenotazione WHERE Prenotazione.convalida = 1 AND &quot;
+              + &quot;Prenotazione.idOperazione = ? AND Prenotazione.idStruttura = ? ORDER BY ora&quot;;
+<span class="fc" id="L294">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L295">      PreparedStatement query = con.prepareStatement(sql);</span>
+<span class="fc" id="L296">      query.setInt(1, idOperazione);</span>
+<span class="fc" id="L297">      query.setInt(2, idStruttura);</span>
+<span class="fc" id="L298">      ResultSet rs = query.executeQuery();</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L300">        prenotazione = new PrenotazioneBean();</span>
+<span class="fc" id="L301">        prenotazione.setId(rs.getInt(1));</span>
+<span class="fc" id="L302">        prenotazione.setData(rs.getDate(2));</span>
+<span class="fc" id="L303">        Long tmp=rs.getTime(3).getTime();</span>
+<span class="fc" id="L304">        String time = String.format(&quot;%02d:%02d:%02d&quot;, (tmp / (1000 * 60 * 60)) % 24, (tmp/ (1000 * 60)) % 60, (tmp / 1000) % 60);</span>
+<span class="fc" id="L305">        prenotazione.setTime(Time.valueOf(time));</span>
+<span class="fc" id="L306">        prenotazione.setConvalida(rs.getBoolean(4));</span>
+<span class="fc" id="L307">        prenotazione.setCodiceFiscale(rs.getString(5));</span>
+<span class="fc" id="L308">        prenotazione.setIdOperazione(rs.getInt(6));</span>
+<span class="fc" id="L309">        prenotazione.setIdStruttura(rs.getInt(7));</span>
+<span class="fc" id="L310">        query.close();</span>
+<span class="fc" id="L311">        return prenotazione;</span>
+      }
+<span class="fc" id="L313">      query.close();</span>
+<span class="fc" id="L314">      rs.close();</span>
+<span class="nc" id="L315">    } catch (SQLException e) {</span>
+<span class="nc" id="L316">      e.printStackTrace();</span>
+<span class="nc" id="L317">      System.err.println(&quot;SQLException:&quot; + e.getMessage());</span>
+<span class="fc" id="L318">    }</span>
+<span class="fc" id="L319">    return null;</span>
+  }
+
+  /**
+   * Metodo che elimina le prenotazioni scadute dal db.
+   *
+   * @return numero prenotazioni scadute
+   */
+  public int deleteOldPrenotation() {
+<span class="fc" id="L328">    int delete = 0;</span>
+<span class="fc" id="L329">    Connection con = null;</span>
+    try {
+<span class="fc" id="L331">      String sql = &quot;DELETE FROM Prenotazione p WHERE data &lt; CURDATE()&quot;;</span>
+<span class="fc" id="L332">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L333">      PreparedStatement query = con.prepareStatement(sql);</span>
+<span class="fc" id="L334">      delete = query.executeUpdate();</span>
+<span class="fc" id="L335">      query.close();</span>
+<span class="fc" id="L336">      con.close();</span>
+<span class="nc" id="L337">    } catch (SQLException e) {</span>
+<span class="nc" id="L338">      e.printStackTrace();</span>
+<span class="nc" id="L339">      System.err.println(&quot;SQLException:&quot; + e.getMessage());</span>
+<span class="fc" id="L340">    }</span>
+<span class="fc" id="L341">    return delete;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

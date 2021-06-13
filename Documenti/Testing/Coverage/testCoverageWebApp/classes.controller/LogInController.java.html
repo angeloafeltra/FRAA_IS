@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LogInController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.controller</a> &gt; <span class="el_source">LogInController.java</span></div><h1>LogInController.java</h1><pre class="source lang-java linenums">package classes.controller;
+
+import classes.model.bean.entity.UtenteBean;
+import classes.model.dao.UtenteModel;
+import classes.model.interfaces.UtenteDaoInterface;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Collection;
+import javax.servlet.http.HttpServlet;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+/** Classe che ci permette di effettuare il login al sito. */
+@RestController
+<span class="fc" id="L23">public class LogInController extends HttpServlet {</span>
+
+<span class="fc" id="L25">  private final UtenteDaoInterface utenteDaoInterface = new UtenteModel();</span>
+<span class="fc" id="L26">  private final String username = &quot;convalidaPortale&quot;;</span>
+<span class="fc" id="L27">  private final String password = &quot;convalidaPortale1!&quot;;</span>
+
+  /**
+   * Metodo che controlla le credenziali inviate.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return Permesso/Non permesso di accesso
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @PostMapping (value = &quot;/login&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public UtenteBean login(@RequestBody String body) throws SQLException {
+<span class="fc" id="L39">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L40">    String username = jsonObject.get(&quot;username&quot;).getAsString();</span>
+<span class="fc" id="L41">    String password = jsonObject.get(&quot;password&quot;).getAsString();</span>
+
+<span class="pc bpc" id="L43" title="1 of 4 branches missed.">    if (username.equals(this.username) &amp;&amp; password.equals(this.password)) {</span>
+<span class="fc" id="L44">      return new UtenteBean();</span>
+    } else {
+<span class="fc" id="L46">      UtenteBean utenteBean = utenteDaoInterface.doRetrieveByKey(username);</span>
+
+<span class="pc bpc" id="L48" title="1 of 4 branches missed.">      if (utenteBean != null &amp;&amp; password.equals(utenteBean.getPassword())) {</span>
+<span class="fc" id="L49">        return utenteBean;</span>
+      } else {
+<span class="fc" id="L51">        return null;</span>
+      }
+    }
+  }
+
+  /**
+   * Metodo che permette di registrarsi al sito.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return conferma o meno della registrazione
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ParseException per problemi di conversione di data
+   */
+  @PostMapping (value = &quot;/signup&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public int signup(@RequestBody String body) throws SQLException,
+          ParseException {
+
+<span class="fc" id="L69">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+
+<span class="fc" id="L71">    String nome = jsonObject.get(&quot;nomeNewUtente&quot;).getAsString();</span>
+    Boolean checkName;
+<span class="fc" id="L73">    checkName = nome.matches(&quot;[A-Za-z]{2,35}$&quot;);</span>
+
+<span class="fc" id="L75">    String cognome = jsonObject.get(&quot;cognomeNewUtente&quot;).getAsString();</span>
+    Boolean checkSurname;
+<span class="fc" id="L77">    checkSurname = cognome.matches(&quot;[A-Za-z]{2,35}$&quot;);</span>
+
+<span class="fc" id="L79">    String codFisc = jsonObject.get(&quot;codFiscNewUtente&quot;).getAsString();</span>
+    Boolean checkCodFisc;
+<span class="fc bfc" id="L81" title="All 2 branches covered.">    checkCodFisc = codFisc.matches(&quot;[A-Z]{6}\\d{2}[A-Z]\\d{2}[A-Z]\\d{3}[A-Z]$&quot;)</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">            &amp;&amp; (utenteDaoInterface.doRetrieveByKey(codFisc) == null);</span>
+
+<span class="fc" id="L84">    String password = jsonObject.get(&quot;passwordNewUtente&quot;).getAsString();</span>
+    Boolean checkPassword;
+<span class="fc" id="L86">    checkPassword =</span>
+<span class="fc" id="L87">            password.matches(&quot;(?=^.{6,50}$)(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).*$&quot;);</span>
+
+<span class="fc" id="L89">    String phoneNumber = jsonObject.get(&quot;numeroTelefonoNewUtente&quot;).getAsString();</span>
+    Boolean checkPhoneNumber;
+<span class="fc" id="L91">    checkPhoneNumber = phoneNumber.matches(&quot;^[0-9]{10,12}&quot;);</span>
+
+<span class="fc" id="L93">    String dataNascita = jsonObject.get(&quot;dataDiNascitaNewUtente&quot;).getAsString();</span>
+<span class="fc" id="L94">    java.util.Date tmp = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;).parse(dataNascita);</span>
+<span class="fc" id="L95">    java.sql.Date dataDiNascita = new Date(tmp.getTime());</span>
+<span class="fc" id="L96">    LocalDate dataNascitaTest = LocalDate.of(dataDiNascita.toLocalDate().getYear(),</span>
+<span class="fc" id="L97">            dataDiNascita.toLocalDate().getMonthValue(),</span>
+<span class="fc" id="L98">            dataDiNascita.toLocalDate().getDayOfMonth());</span>
+<span class="fc" id="L99">    LocalDate oggi = LocalDate.now();</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    Boolean checkDataDiNascita = (Period.between(dataNascitaTest, oggi).getYears()) &gt; 17;</span>
+
+<span class="fc" id="L102">    String email = jsonObject.get(&quot;emailNewUtente&quot;).getAsString();</span>
+    Boolean checkMail;
+<span class="fc" id="L104">    checkMail = email.matches(</span>
+            &quot;^(?=.{8,255}$)[_a-z0-9-]+(\\.[_a-z0-9-]+)*@[a-z0-9-]+(\\.[a-z0-9-]+)*(\\.[a-z]{2,4})$&quot;
+    );
+
+    UtenteBean utenteBean;
+
+<span class="fc" id="L110">    Collection&lt;UtenteBean&gt; allUtenti = utenteDaoInterface.doRetrieveAll(&quot;&quot;);</span>
+
+<span class="fc bfc" id="L112" title="All 2 branches covered.">    for (UtenteBean b : allUtenti) {</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">      if (b.getCodiceFiscale().matches(codFisc)) {</span>
+<span class="fc" id="L114">        return 2;</span>
+      }
+<span class="fc" id="L116">    }</span>
+
+<span class="fc bfc" id="L118" title="All 2 branches covered.">    if (!checkPassword) {</span>
+<span class="fc" id="L119">      return 0;</span>
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">    } else if (!checkDataDiNascita) {</span>
+<span class="nc" id="L121">      return 4;</span>
+    } else {
+<span class="pc bpc" id="L123" title="3 of 6 branches missed.">      if (checkName &amp;&amp; checkSurname &amp;&amp; checkPhoneNumber</span>
+<span class="pc bpc" id="L124" title="1 of 4 branches missed.">              &amp;&amp; checkCodFisc &amp;&amp; checkMail) {</span>
+<span class="fc" id="L125">        utenteBean = new UtenteBean(codFisc, password, nome, cognome,</span>
+                dataDiNascita, email, phoneNumber);
+<span class="fc" id="L127">        utenteDaoInterface.doSave(utenteBean);</span>
+<span class="fc" id="L128">        return 1;</span>
+      } else {
+<span class="fc" id="L130">        return 3;</span>
+      }
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

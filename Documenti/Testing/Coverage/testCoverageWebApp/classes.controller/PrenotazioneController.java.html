@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PrenotazioneController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.controller</a> &gt; <span class="el_source">PrenotazioneController.java</span></div><h1>PrenotazioneController.java</h1><pre class="source lang-java linenums">package classes.controller;
+
+import classes.controller.exception.ErrorNewObjectException;
+import classes.controller.exception.InvalidKeyException;
+import classes.controller.exception.ObjectNotFoundException;
+import classes.model.bean.entity.OperazioneBean;
+import classes.model.bean.entity.PrenotazioneBean;
+import classes.model.bean.entity.StrutturaBean;
+import classes.model.bean.entity.UtenteBean;
+import classes.model.dao.OperazioneModel;
+import classes.model.dao.PrenotazioneModel;
+import classes.model.dao.StrutturaModel;
+import classes.model.dao.UtenteModel;
+import classes.model.interfaces.OperazioneDaoInterface;
+import classes.model.interfaces.PrenotazioneDaoInterface;
+import classes.model.interfaces.StrutturaDaoInterface;
+import classes.model.interfaces.UtenteDaoInterface;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * Classe utilizzata per controllare i metodi del Model di Prenotazione, in aggiunta si implementa
+ * un metodo per poter prendere le prenotazioni di un singolo utente.
+ */
+@RestController
+<span class="fc" id="L38">public class PrenotazioneController {</span>
+<span class="fc" id="L39">  private final PrenotazioneDaoInterface prenotazioneDaoInterface = new PrenotazioneModel();</span>
+<span class="fc" id="L40">  private final StrutturaDaoInterface strutturaDaoInterface = new StrutturaModel();</span>
+<span class="fc" id="L41">  private final OperazioneDaoInterface operazioneDaoInterface = new OperazioneModel();</span>
+<span class="fc" id="L42">  private final UtenteDaoInterface utenteDaoInterface = new UtenteModel();</span>
+
+  /**
+   * Metodo che permette di utilizzare il prelevamento per id del PrenotazioneModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return Prenotazione avente l'id passato
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ObjectNotFoundException per problemi di oggetto non trovato
+   * @throws InvalidKeyException per problemi di chiave primaria
+   */
+  @PostMapping(value = &quot;/prenotazione/{id}&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public PrenotazioneBean getPrenotazioneById(@RequestBody String body) throws SQLException,
+          ObjectNotFoundException, InvalidKeyException {
+<span class="fc" id="L57">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L58">    String id = jsonObject.get(&quot;idPrenotazioneGet&quot;).getAsString();</span>
+
+<span class="fc" id="L60">    PrenotazioneBean prenotazioneBean =</span>
+<span class="fc" id="L61">            prenotazioneDaoInterface.doRetrieveByKey(Integer.valueOf(id));</span>
+
+<span class="fc bfc" id="L63" title="All 2 branches covered.">    if (Integer.valueOf(id) &gt; 0) {</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">      if (prenotazioneBean != null) {</span>
+<span class="fc" id="L65">        return prenotazioneBean;</span>
+      } else {
+<span class="fc" id="L67">        throw new ObjectNotFoundException(new PrenotazioneBean());</span>
+      }
+    } else {
+<span class="fc" id="L70">      throw new InvalidKeyException(&quot;Id prenotazione non valido&quot;);</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di utilizzare il prelevamento di tutti gli oggetti del PrenotazioneModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return Collezione di Prenotazione
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @PostMapping(value = &quot;/prenotazioni&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public Collection&lt;PrenotazioneBean&gt; getAllPrenotazioni(@RequestBody String body)
+          throws SQLException {
+<span class="fc" id="L85">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L86">    String order = jsonObject.get(&quot;ordinePrenotazioni&quot;).getAsString();</span>
+<span class="fc" id="L87">    return prenotazioneDaoInterface.doRetrieveAll(order);</span>
+  }
+
+  /**
+   * Metodo che permette di utilizzare l'inserimento di una nuova prenotazione tramite
+   * PrenotazioneModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ParseException per problemi di parse
+   * @throws ErrorNewObjectException per problemi di creazione di un oggetto
+   * @return conferma/non conferma del salvataggio della prenotazione
+   */
+  @PostMapping(value = &quot;/newPrenotazione&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public boolean newPrenotazione(@RequestBody String body) throws SQLException,
+          ParseException, ErrorNewObjectException {
+<span class="fc" id="L104">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L105">    String cf = jsonObject.get(&quot;newPrenotazioniCf&quot;).getAsString();</span>
+<span class="fc" id="L106">    String ora = jsonObject.get(&quot;newPrenotazioniOra&quot;).getAsString();</span>
+<span class="fc" id="L107">    String idOperazione = jsonObject.get(&quot;newPrenotazioniIdOp&quot;).getAsString();</span>
+<span class="fc" id="L108">    String idStruttura = jsonObject.get(&quot;newPrenotazioniIdS&quot;).getAsString();</span>
+
+    StrutturaBean strutturaBean;
+    OperazioneBean operazioneBean;
+    UtenteBean utenteBean;
+<span class="fc" id="L113">    strutturaBean = strutturaDaoInterface.doRetrieveByKey(Integer.valueOf(idStruttura));</span>
+<span class="fc" id="L114">    operazioneBean = operazioneDaoInterface.doRetrieveByKey(Integer.valueOf(idOperazione));</span>
+<span class="fc" id="L115">    utenteBean = utenteDaoInterface.doRetrieveByKey(cf);</span>
+
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">    boolean checkStruttura = strutturaBean != null;</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">    boolean checkOperazione = operazioneBean != null;</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">    boolean checkUtente = utenteBean != null;</span>
+
+<span class="fc" id="L121">    String data = jsonObject.get(&quot;newPrenotazioneData&quot;).getAsString();</span>
+<span class="fc" id="L122">    java.util.Date tmp = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;).parse(data);</span>
+<span class="fc" id="L123">    java.sql.Date dataPrenotazione = new Date(tmp.getTime());</span>
+<span class="fc" id="L124">    LocalDate oggi = LocalDate.now();</span>
+<span class="fc" id="L125">    boolean checkDate = dataPrenotazione.toLocalDate().isBefore(oggi);</span>
+
+
+<span class="fc bfc" id="L128" title="All 2 branches covered.">    if (checkDate) {</span>
+<span class="fc" id="L129">      return false;</span>
+<span class="pc bpc" id="L130" title="2 of 6 branches missed.">    } else if (checkOperazione &amp;&amp; checkStruttura &amp;&amp; checkUtente) {</span>
+<span class="fc" id="L131">      prenotazioneDaoInterface.doSave(new PrenotazioneBean(ora, dataPrenotazione, cf,</span>
+<span class="fc" id="L132">              Integer.valueOf(idOperazione), Integer.valueOf(idStruttura), false));</span>
+<span class="fc" id="L133">      return true;</span>
+    } else {
+<span class="fc" id="L135">      throw new ErrorNewObjectException(new PrenotazioneBean());</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di utilizzare l'eliminazione di una prenotazione presente sul DB tramite
+   * PrenotazioneModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @PostMapping(value = &quot;/deletePrenotazione&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public void deletePrenotazione(@RequestBody String body) throws SQLException {
+<span class="fc" id="L149">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L150">    String id = jsonObject.get(&quot;deletePrenotazioniId&quot;).getAsString();</span>
+<span class="fc" id="L151">    int idInt = Integer.valueOf(id);</span>
+<span class="fc" id="L152">    prenotazioneDaoInterface.doDelete(prenotazioneDaoInterface.doRetrieveByKey(idInt));</span>
+<span class="fc" id="L153">  }</span>
+
+  /**
+   * Metodo che permette di utilizzare l'aggiornamento di una prenotazione presente sul DB tramite
+   * PrenotazioneModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ParseException per problemi di parse
+   * @throws ErrorNewObjectException per problemi di creazione dell'oggetto
+   * @throws ObjectNotFoundException per problemi di oggetto non trovato
+   * @return conferma/non conferma dell'aggiornamento
+   */
+  @PostMapping(value = &quot;/updatePrenotazione&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public boolean updatePrenotazione(@RequestBody String body) throws SQLException,
+          ParseException {
+<span class="fc" id="L170">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L171">    String id = jsonObject.get(&quot;updatePrenotazioniId&quot;).getAsString();</span>
+<span class="fc" id="L172">    String cf = jsonObject.get(&quot;updatePrenotazioniCf&quot;).getAsString();</span>
+<span class="fc" id="L173">    String ora = jsonObject.get(&quot;updatePrenotazioniOra&quot;).getAsString();</span>
+<span class="fc" id="L174">    String idOperazione = jsonObject.get(&quot;updatePrenotazioniIdOp&quot;).getAsString();</span>
+<span class="fc" id="L175">    String idStruttura = jsonObject.get(&quot;updatePrenotazioniIdS&quot;).getAsString();</span>
+<span class="fc" id="L176">    String data = jsonObject.get(&quot;updatePrenotazioneData&quot;).getAsString();</span>
+<span class="fc" id="L177">    java.util.Date tmp = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;).parse(data);</span>
+<span class="fc" id="L178">    java.sql.Date dataPrenotazione = new Date(tmp.getTime());</span>
+<span class="fc" id="L179">    Boolean cv = jsonObject.get(&quot;updatePrenotazioneConvalida&quot;).getAsBoolean();</span>
+<span class="fc" id="L180">    PrenotazioneBean prenotazioneBean =</span>
+<span class="fc" id="L181">            prenotazioneDaoInterface.doRetrieveByKey(Integer.valueOf(id));</span>
+
+<span class="fc bfc" id="L183" title="All 2 branches covered.">    if (prenotazioneBean != null) {</span>
+      StrutturaBean strutturaBean;
+      OperazioneBean operazioneBean;
+<span class="fc" id="L186">      operazioneBean = operazioneDaoInterface.doRetrieveByKey(Integer.valueOf(idOperazione));</span>
+<span class="fc" id="L187">      strutturaBean = strutturaDaoInterface.doRetrieveByKey(Integer.valueOf(idStruttura));</span>
+
+<span class="fc" id="L189">      boolean checkCodFisc = cf.matches(&quot;[A-Z]{6}\\d{2}[A-Z]\\d{2}[A-Z]\\d{3}[A-Z]$&quot;);</span>
+<span class="fc" id="L190">      boolean checkOra = ora.matches(&quot;^([0-1][0-9]|[2][0-3]):([0-5][0-9]):([0-5][0-9])$&quot;);</span>
+
+<span class="pc bpc" id="L192" title="3 of 8 branches missed.">      if (checkCodFisc &amp;&amp; checkOra &amp;&amp; operazioneBean != null &amp;&amp; strutturaBean != null) {</span>
+<span class="fc" id="L193">        prenotazioneBean.setDataPrenotazione(dataPrenotazione);</span>
+<span class="fc" id="L194">        prenotazioneBean.setConvalida(cv);</span>
+<span class="fc" id="L195">        prenotazioneBean.setCodiceFiscale(cf);</span>
+<span class="fc" id="L196">        prenotazioneBean.setIdStruttura(Integer.valueOf(idStruttura));</span>
+<span class="fc" id="L197">        prenotazioneBean.setIdOperazione(Integer.valueOf(idOperazione));</span>
+<span class="fc" id="L198">        prenotazioneBean.setOra(ora);</span>
+<span class="fc" id="L199">        prenotazioneDaoInterface.doUpdate(prenotazioneBean);</span>
+<span class="fc" id="L200">        return true;</span>
+      } else {
+<span class="fc" id="L202">        throw new ErrorNewObjectException(&quot;Errore nell'aggiornamento della prenotazione&quot;);</span>
+      }
+    } else {
+<span class="fc" id="L205">      throw new ObjectNotFoundException(new PrenotazioneBean());</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di avere tutte le prenotazione di un utente in base al suo Codice Fiscale.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return Prenotazioni di quell'utente
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @PostMapping(value = &quot;/prenotazioniUtente/{cf}&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public Collection&lt;PrenotazioneBean&gt; getPrenotazioniByCodFisc(@RequestBody String body)
+          throws SQLException {
+<span class="fc" id="L220">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L221">    String cf = jsonObject.get(&quot;getPrenotazioniByCf&quot;).getAsString();</span>
+<span class="fc" id="L222">    return prenotazioneDaoInterface.getUtentePrenotazioni(cf);</span>
+  }
+
+  /**
+   * Metodo per la convalida della prenotazione.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return conferma/non conferma della convalida
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ParseException per problemi di parse
+   */
+  @PostMapping(value = &quot;/convalida&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public int convalidaPrenotazione(@RequestBody String body)
+          throws SQLException, ParseException {
+<span class="fc" id="L237">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L238">    String cf = jsonObject.get(&quot;convalidaPrenotazione&quot;).getAsString();</span>
+
+    //Prendo la prenotazione
+<span class="fc" id="L241">    Collection&lt;PrenotazioneBean&gt; collection = prenotazioneDaoInterface.getUtentePrenotazioni(cf);</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">    if (collection == null) {</span>
+<span class="fc" id="L243">      return 0;</span>
+    }
+
+<span class="fc" id="L246">    Iterator iter = collection.iterator();</span>
+<span class="fc" id="L247">    PrenotazioneBean prenotazioneBean = (PrenotazioneBean) iter.next();</span>
+
+    //Impostazioni variabili data, ora e codice fiscale
+<span class="fc" id="L250">    prenotazioneBean.getDataPrenotazione();</span>
+<span class="fc" id="L251">    java.sql.Date d = prenotazioneBean.getDataPrenotazione();</span>
+<span class="fc" id="L252">    String ora = prenotazioneBean.getOra();</span>
+<span class="fc" id="L253">    SimpleDateFormat df = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span>
+<span class="fc" id="L254">    Long minHour =</span>
+<span class="fc" id="L255">            df.parse(d.toString() + &quot; &quot; + ora).getTime() - (1800 * 1000);</span>
+<span class="fc" id="L256">    Long maxHour =</span>
+<span class="fc" id="L257">            df.parse(d.toString() + &quot; &quot; + ora).getTime() + (600 * 1000);</span>
+<span class="fc" id="L258">    Long timeNow = System.currentTimeMillis();</span>
+
+<span class="fc" id="L260">    Date dateNow = new Date(timeNow);</span>
+<span class="fc" id="L261">    Date dateMin = new Date(minHour);</span>
+<span class="fc" id="L262">    Date dateMax = new Date(maxHour);</span>
+
+<span class="fc bfc" id="L264" title="All 2 branches covered.">    if (!((dateNow.toLocalDate().getDayOfMonth() == d.toLocalDate().getDayOfMonth())</span>
+<span class="pc bpc" id="L265" title="1 of 2 branches missed.">            &amp;&amp; (dateNow.toLocalDate().getMonth() == d.toLocalDate().getMonth()))) {</span>
+<span class="fc" id="L266">      return 2;</span>
+<span class="fc bfc" id="L267" title="All 2 branches covered.">    } else if (!dateNow.after(dateMin)) {</span>
+<span class="fc" id="L268">      return 3;</span>
+<span class="fc bfc" id="L269" title="All 2 branches covered.">    } else if (!dateNow.before(dateMax)) {</span>
+<span class="fc" id="L270">      prenotazioneDaoInterface.doDelete(prenotazioneBean);</span>
+<span class="fc" id="L271">      return 4;</span>
+<span class="fc bfc" id="L272" title="All 2 branches covered.">    } else if (prenotazioneBean.isConvalida()) {</span>
+<span class="fc" id="L273">      return 5;</span>
+    } else {
+<span class="fc" id="L275">      prenotazioneBean.setConvalida(true);</span>
+<span class="fc" id="L276">      prenotazioneDaoInterface.doUpdate(prenotazioneBean);</span>
+<span class="fc" id="L277">      return 1;</span>
+    }
+  }
+
+  /**
+   * Metodo per prelevare gli orari di prenotazione liberi.
+   *
+   * @param body Il contenuto della request
+   * @return Collezione di orari
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ParseException per problemi di parse
+   */
+
+  @PostMapping(value = &quot;/getOrari&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public List&lt;String&gt; getOrariDisponibili(@RequestBody String body)
+          throws SQLException, ParseException {
+<span class="fc" id="L294">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L295">    int idStruttura = jsonObject.get(&quot;idStruttura&quot;).getAsInt();</span>
+<span class="fc" id="L296">    int idOperazione = jsonObject.get(&quot;idOperazione&quot;).getAsInt();</span>
+<span class="fc" id="L297">    String data = jsonObject.get(&quot;PrenotazioneData&quot;).getAsString();</span>
+<span class="fc" id="L298">    java.util.Date tmp = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;).parse(data);</span>
+<span class="fc" id="L299">    java.sql.Date dataPrenotazione = new Date(tmp.getTime());</span>
+
+<span class="fc" id="L301">    return prenotazioneDaoInterface.getOrariPrenotazione(idStruttura,</span>
+            idOperazione, dataPrenotazione);
+
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

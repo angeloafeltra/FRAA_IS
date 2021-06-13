@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UtenteController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.controller</a> &gt; <span class="el_source">UtenteController.java</span></div><h1>UtenteController.java</h1><pre class="source lang-java linenums">package classes.controller;
+
+import classes.controller.exception.ErrorNewObjectException;
+import classes.controller.exception.InvalidKeyException;
+import classes.controller.exception.ObjectNotFoundException;
+import classes.model.bean.entity.UtenteBean;
+import classes.model.dao.UtenteModel;
+import classes.model.interfaces.UtenteDaoInterface;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+/** Classe per controllare i metodi del Model di Utente. */
+@RestController
+<span class="fc" id="L23">public class UtenteController {</span>
+<span class="fc" id="L24">  private final UtenteDaoInterface utenteModel = new UtenteModel();</span>
+
+  /**
+   * Metodo che permette di utilizzare il prelevamento per id dell'UtenteModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return Utente avente il codice fiscale passato
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ObjectNotFoundException per problemi di oggetto non trovato
+   * @throws InvalidKeyException per problemi di chiave primaria
+   */
+  @PostMapping(value = &quot;/utente/{cf}&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public UtenteBean getUtenteByCodFisc(@RequestBody String body)
+          throws SQLException, ObjectNotFoundException, InvalidKeyException {
+<span class="fc" id="L39">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L40">    String cf = jsonObject.get(&quot;idUtenteGet&quot;).getAsString();</span>
+<span class="fc" id="L41">    UtenteBean utenteBean = utenteModel.doRetrieveByKey(cf);</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">    if (cf.matches(&quot;[A-Z]{6}\\d{2}[A-Z]\\d{2}[A-Z]\\d{3}[A-Z]$&quot;)) {</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">      if (utenteBean != null) {</span>
+<span class="fc" id="L44">        return utenteBean;</span>
+      } else {
+<span class="fc" id="L46">        throw new ObjectNotFoundException(new UtenteBean());</span>
+      }
+    } else {
+<span class="fc" id="L49">      throw new InvalidKeyException(&quot;Codice fiscale non valido&quot;);</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di utilizzare il prelevamento di tutti gli oggetti dell'UtenteModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return Collezione di Utenti
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @PostMapping(value = &quot;/utenti&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public Collection&lt;UtenteBean&gt; getAllUtenti(@RequestBody String body) throws SQLException {
+<span class="fc" id="L63">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L64">    String order = jsonObject.get(&quot;ordineUtenti&quot;).getAsString();</span>
+<span class="fc" id="L65">    return utenteModel.doRetrieveAll(order);</span>
+  }
+
+  /**
+   * Metodo che permette di utilizzare l'inserimento di un nuovo utente tramite UtenteController.
+   *
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ErrorNewObjectException per problemi di creazione oggetti
+   * @throws ParseException per problemi di parsing
+   * @return conferma/non conferma del salvataggio dell'utente
+   */
+  @PostMapping(value = &quot;/newUtente&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public boolean newUtente(@RequestBody String body) throws SQLException,
+          ErrorNewObjectException, ParseException {
+<span class="fc" id="L81">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L82">    String cf = jsonObject.get(&quot;newUtenteCf&quot;).getAsString();</span>
+    Boolean checkCodFisc;
+<span class="fc" id="L84">    checkCodFisc = cf.matches(&quot;[A-Z]{6}\\d{2}[A-Z]\\d{2}[A-Z]\\d{3}[A-Z]$&quot;);</span>
+
+<span class="fc" id="L86">    String password = jsonObject.get(&quot;newUtentePassword&quot;).getAsString();</span>
+    Boolean checkPassword;
+<span class="fc" id="L88">    checkPassword =</span>
+<span class="fc" id="L89">            password.matches(&quot;(?=^.{8,}$)(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).*$&quot;);</span>
+
+<span class="fc" id="L91">    String cognome = jsonObject.get(&quot;newUtenteCognome&quot;).getAsString();</span>
+    Boolean checkSurname;
+<span class="fc" id="L93">    checkSurname = cognome.matches(&quot;[A-Za-z]+$&quot;);</span>
+
+<span class="fc" id="L95">    String nome = jsonObject.get(&quot;newUtenteNome&quot;).getAsString();</span>
+    Boolean checkName;
+<span class="fc" id="L97">    checkName = nome.matches(&quot;[A-Za-z]+$&quot;);</span>
+
+<span class="fc" id="L99">    String phoneNumber = jsonObject.get(&quot;newUtentePhoneNumber&quot;).getAsString();</span>
+    Boolean checkPhoneNumber;
+<span class="fc" id="L101">    checkPhoneNumber = phoneNumber.matches(&quot;^[0-9]{10,12}&quot;);</span>
+
+<span class="fc" id="L103">    String email = jsonObject.get(&quot;newUtenteEmail&quot;).getAsString();</span>
+    Boolean checkMail;
+<span class="fc" id="L105">    checkMail = email.matches(&quot;\\S+@\\S+\\.\\S+&quot;);</span>
+
+<span class="fc" id="L107">    String dataN = jsonObject.get(&quot;newUtenteDataN&quot;).getAsString();</span>
+<span class="fc" id="L108">    java.util.Date tmp = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;).parse(dataN);</span>
+<span class="fc" id="L109">    java.sql.Date dataNascita = new Date(tmp.getTime());</span>
+
+<span class="fc" id="L111">    UtenteBean utenteBean = new UtenteBean();</span>
+<span class="pc bpc" id="L112" title="3 of 6 branches missed.">    if (checkName &amp;&amp; checkSurname &amp;&amp; checkPassword</span>
+<span class="pc bpc" id="L113" title="2 of 6 branches missed.">            &amp;&amp; checkPhoneNumber &amp;&amp; checkCodFisc &amp;&amp; checkMail) {</span>
+<span class="fc" id="L114">      utenteBean.setNumeroDiTelefono(phoneNumber);</span>
+<span class="fc" id="L115">      utenteBean.setPassword(password);</span>
+<span class="fc" id="L116">      utenteBean.setEmail(email);</span>
+<span class="fc" id="L117">      utenteBean.setCognome(cognome);</span>
+<span class="fc" id="L118">      utenteBean.setNome(nome);</span>
+<span class="fc" id="L119">      utenteBean.setDataDiNascita(dataNascita);</span>
+<span class="fc" id="L120">      utenteBean.setCodiceFiscale(cf);</span>
+<span class="fc" id="L121">      utenteModel.doSave(utenteBean);</span>
+<span class="fc" id="L122">      return true;</span>
+    } else {
+<span class="fc" id="L124">      throw new ErrorNewObjectException(new UtenteBean());</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di utilizzare l'eliminazione di un ambulatorio presente sul DB tramite
+   * UtenteController.
+   *
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @PostMapping(value = &quot;/deleteUtente&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public void deleteUtente(@RequestBody String body) throws SQLException {
+<span class="fc" id="L138">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L139">    String id = jsonObject.get(&quot;deleteUtenteId&quot;).getAsString();</span>
+<span class="fc" id="L140">    utenteModel.doDelete(utenteModel.doRetrieveByKey(id));</span>
+<span class="fc" id="L141">  }</span>
+
+  /**
+   * Metodo che permette di utilizzare l'aggiornamento di un ambulatorio presente sul DB tramite
+   * UtenteController.
+   *
+   * @return conferma/non conferma dell'aggiornamento dell'utente
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ParseException per problemi di parsing
+   * @throws ErrorNewObjectException per problemi di creazione oggetti
+   * @throws ObjectNotFoundException per problemi di chiave primaria
+   */
+  @PostMapping(value = &quot;/updateUtente&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public boolean updateUtente(@RequestBody String body) throws SQLException,
+          ParseException {
+<span class="fc" id="L158">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L159">    String cf = jsonObject.get(&quot;updateUtenteCf&quot;).getAsString();</span>
+<span class="fc" id="L160">    UtenteBean u = utenteModel.doRetrieveByKey(cf);</span>
+
+<span class="fc bfc" id="L162" title="All 2 branches covered.">    if (u != null) {</span>
+<span class="fc" id="L163">      String password = jsonObject.get(&quot;updateUtentePassword&quot;).getAsString();</span>
+      Boolean checkPassword;
+<span class="fc" id="L165">      checkPassword =</span>
+<span class="fc" id="L166">              password.matches(&quot;(?=^.{8,}$)(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).*$&quot;);</span>
+
+<span class="fc" id="L168">      String cognome = jsonObject.get(&quot;updateUtenteCognome&quot;).getAsString();</span>
+      Boolean checkSurname;
+<span class="fc" id="L170">      checkSurname = cognome.matches(&quot;[A-Za-z ]+$&quot;);</span>
+
+<span class="fc" id="L172">      String nome = jsonObject.get(&quot;updateUtenteNome&quot;).getAsString();</span>
+      Boolean checkName;
+<span class="fc" id="L174">      checkName = nome.matches(&quot;[A-Za-z ]+$&quot;);</span>
+
+<span class="fc" id="L176">      String phoneNumber = jsonObject.get(&quot;updateUtentePhoneNumber&quot;).getAsString();</span>
+      Boolean checkPhoneNumber;
+<span class="fc" id="L178">      checkPhoneNumber = phoneNumber.matches(&quot;^[0-9]{10,12}&quot;);</span>
+
+<span class="fc" id="L180">      String email = jsonObject.get(&quot;updateUtenteEmail&quot;).getAsString();</span>
+      Boolean checkMail;
+<span class="fc" id="L182">      checkMail = email.matches(&quot;\\S+@\\S+\\.\\S+&quot;);</span>
+
+<span class="fc" id="L184">      String dataN = jsonObject.get(&quot;updateUtenteDataN&quot;).getAsString();</span>
+<span class="fc" id="L185">      java.util.Date tmp = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;).parse(dataN);</span>
+<span class="fc" id="L186">      java.sql.Date dataNascita = new Date(tmp.getTime());</span>
+
+<span class="pc bpc" id="L188" title="2 of 6 branches missed.">      if (checkName &amp;&amp; checkSurname &amp;&amp; checkPassword</span>
+<span class="pc bpc" id="L189" title="2 of 4 branches missed.">          &amp;&amp; checkPhoneNumber &amp;&amp; checkMail) {</span>
+<span class="fc" id="L190">        u.setPassword(password);</span>
+<span class="fc" id="L191">        u.setNome(nome);</span>
+<span class="fc" id="L192">        u.setNumeroDiTelefono(phoneNumber);</span>
+<span class="fc" id="L193">        u.setDataDiNascita(dataNascita);</span>
+<span class="fc" id="L194">        u.setEmail(email);</span>
+<span class="fc" id="L195">        utenteModel.doUpdate(u);</span>
+<span class="fc" id="L196">        return true;</span>
+      } else {
+<span class="fc" id="L198">        throw new ErrorNewObjectException(new UtenteBean());</span>
+      }
+    }
+<span class="fc" id="L201">    throw new ObjectNotFoundException(new UtenteBean());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PrenotazioneControllerTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.controller</a> &gt; <span class="el_source">PrenotazioneControllerTest.java</span></div><h1>PrenotazioneControllerTest.java</h1><pre class="source lang-java linenums">package classes.controller;
+
+import classes.controller.exception.ErrorNewObjectException;
+import classes.controller.exception.InvalidKeyException;
+import classes.controller.exception.ObjectNotFoundException;
+import classes.model.bean.entity.PrenotazioneBean;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.apache.tomcat.jni.Time;
+import org.junit.jupiter.api.Test;
+
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="fc" id="L22">class PrenotazioneControllerTest {</span>
+<span class="fc" id="L23">    private JsonParser parser = new JsonParser();</span>
+<span class="fc" id="L24">    private PrenotazioneController prenotazioneController = new PrenotazioneController();</span>
+    private JsonElement jsonElement;
+    private JsonObject rootObject;
+    private JsonObject finalRootObject;
+
+    @Test
+    void getPrenotazioneById() throws SQLException, InvalidKeyException {
+<span class="fc" id="L31">        jsonElement = parser.parse(&quot;{\&quot;idPrenotazioneGet\&quot;:\&quot;1\&quot;}&quot;);</span>
+<span class="fc" id="L32">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L33">        assertNotNull(prenotazioneController.getPrenotazioneById(rootObject.toString()));</span>
+
+<span class="fc" id="L35">        jsonElement = parser.parse(&quot;{\&quot;idPrenotazioneGet\&quot;:\&quot;0\&quot;}&quot;);</span>
+<span class="fc" id="L36">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L37">        finalRootObject = rootObject;</span>
+<span class="fc" id="L38">        InvalidKeyException invalidKeyException = assertThrows(InvalidKeyException.class, () -&gt; {</span>
+<span class="nc" id="L39">            prenotazioneController.getPrenotazioneById(finalRootObject.toString());</span>
+<span class="nc" id="L40">        });</span>
+
+<span class="fc" id="L42">        jsonElement = parser.parse(&quot;{\&quot;idPrenotazioneGet\&quot;:\&quot;79813\&quot;}&quot;);</span>
+<span class="fc" id="L43">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L44">        finalRootObject = rootObject;</span>
+<span class="fc" id="L45">        ObjectNotFoundException objectNotFoundException = assertThrows(ObjectNotFoundException.class, () -&gt; {</span>
+<span class="nc" id="L46">            prenotazioneController.getPrenotazioneById(finalRootObject.toString());</span>
+<span class="nc" id="L47">        });</span>
+<span class="fc" id="L48">    }</span>
+
+    @Test
+    void getAllPrenotazioni() throws SQLException {
+<span class="fc" id="L52">        jsonElement = parser.parse(&quot;{\&quot;ordinePrenotazioni\&quot;:\&quot;data\&quot;}&quot;);</span>
+<span class="fc" id="L53">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L54">        prenotazioneController.getAllPrenotazioni(rootObject.toString());</span>
+
+<span class="fc" id="L56">        jsonElement = parser.parse(&quot;{\&quot;ordinePrenotazioni\&quot;:\&quot;\&quot;}&quot;);</span>
+<span class="fc" id="L57">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L58">        assertNotNull(prenotazioneController.getAllPrenotazioni(rootObject.toString()));</span>
+<span class="fc" id="L59">    }</span>
+
+    @Test
+    void newPrenotazione() throws SQLException, ParseException {
+<span class="fc" id="L63">        jsonElement = parser.parse(</span>
+                &quot;{\&quot;newPrenotazioniCf\&quot;:\&quot;MNDCMN97R22A509S\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniOra\&quot;:\&quot;15:30:00\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniIdOp\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniIdS\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioneData\&quot;:\&quot;2021-02-13\&quot;}&quot;);
+<span class="fc" id="L69">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L70">        assertFalse(prenotazioneController.newPrenotazione(rootObject.toString()));</span>
+
+<span class="fc" id="L72">        LocalDateTime dataPerOra = LocalDateTime.now();</span>
+<span class="fc" id="L73">        String data = dataPerOra.getYear() + &quot;-&quot; + dataPerOra.getMonthValue()</span>
+<span class="fc" id="L74">                + &quot;-&quot; + dataPerOra.getDayOfMonth();</span>
+<span class="fc" id="L75">        jsonElement = parser.parse(</span>
+                &quot;{\&quot;newPrenotazioniCf\&quot;:\&quot;CNDVKM62S23B586F\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniOra\&quot;:\&quot;15:30:00\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniIdOp\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniIdS\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioneData\&quot;:\&quot;&quot;+data+&quot;\&quot;}&quot;);
+<span class="fc" id="L81">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L82">        assertTrue(prenotazioneController.newPrenotazione(rootObject.toString()));</span>
+
+<span class="fc" id="L84">        jsonElement = parser.parse(</span>
+                &quot;{\&quot;newPrenotazioniCf\&quot;:\&quot;ERRORE 1294571507\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniOra\&quot;:\&quot;15:30:00\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniIdOp\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniIdS\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioneData\&quot;:\&quot;&quot;+data+&quot;\&quot;}&quot;);
+<span class="fc" id="L90">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L91">        ErrorNewObjectException errorNewObjectException = assertThrows(ErrorNewObjectException.class, () -&gt; {</span>
+<span class="nc" id="L92">            prenotazioneController.newPrenotazione(rootObject.toString());</span>
+<span class="nc" id="L93">        });</span>
+<span class="fc" id="L94">    }</span>
+
+    @Test
+    void deletePrenotazione() throws SQLException {
+<span class="fc" id="L98">        jsonElement = parser.parse(&quot;{\&quot;deletePrenotazioniId\&quot;:\&quot;9\&quot;}&quot;);</span>
+<span class="fc" id="L99">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L100">        prenotazioneController.deletePrenotazione(rootObject.toString());</span>
+<span class="fc" id="L101">    }</span>
+
+    @Test
+    void updatePrenotazione() throws SQLException, ParseException {
+<span class="fc" id="L105">        jsonElement = parser.parse(</span>
+                &quot;{\&quot;updatePrenotazioniId\&quot;:\&quot;7\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioniCf\&quot;:\&quot;SQLRFL97R10F839D\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioniOra\&quot;:\&quot;09:30:00\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioniIdOp\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioniIdS\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioneData\&quot;:\&quot;2021-03-11\&quot;,&quot;+
+                        &quot;\&quot;updatePrenotazioneConvalida\&quot;:\&quot;false\&quot;}&quot;);
+<span class="fc" id="L113">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L114">        assertTrue(prenotazioneController.updatePrenotazione(rootObject.toString()));</span>
+
+<span class="fc" id="L116">        jsonElement = parser.parse(</span>
+                &quot;{\&quot;updatePrenotazioniId\&quot;:\&quot;7\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioniCf\&quot;:\&quot;SQLRFL97R10F839D\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioniOra\&quot;:\&quot;9:30:00\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioniIdOp\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioniIdS\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioneData\&quot;:\&quot;2021-03-11\&quot;,&quot;+
+                        &quot;\&quot;updatePrenotazioneConvalida\&quot;:\&quot;false\&quot;}&quot;);
+<span class="fc" id="L124">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L125">        ErrorNewObjectException errorNewObjectException = assertThrows(ErrorNewObjectException.class, () -&gt; {</span>
+<span class="nc" id="L126">            prenotazioneController.updatePrenotazione(rootObject.toString());</span>
+<span class="nc" id="L127">        });</span>
+
+<span class="fc" id="L129">        jsonElement = parser.parse(</span>
+                &quot;{\&quot;updatePrenotazioniId\&quot;:\&quot;789456\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioniCf\&quot;:\&quot;DRGMRA99D09A509V\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioniOra\&quot;:\&quot;12:00:00\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioniIdOp\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioniIdS\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;updatePrenotazioneData\&quot;:\&quot;13-02-2021\&quot;,&quot;+
+                        &quot;\&quot;updatePrenotazioneConvalida\&quot;:\&quot;false\&quot;}&quot;);
+<span class="fc" id="L137">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L138">        ObjectNotFoundException objectNotFoundException = assertThrows(ObjectNotFoundException.class, () -&gt; {</span>
+<span class="nc" id="L139">            prenotazioneController.updatePrenotazione(rootObject.toString());</span>
+<span class="nc" id="L140">        });</span>
+<span class="fc" id="L141">    }</span>
+
+    @Test
+    void getPrenotazioniByCodFisc() throws SQLException {
+<span class="fc" id="L145">        jsonElement = parser.parse(&quot;{\&quot;getPrenotazioniByCf\&quot;:\&quot;MNDCMN97R22A509S\&quot;}&quot;);</span>
+<span class="fc" id="L146">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L147">        assertNotNull(prenotazioneController.getPrenotazioniByCodFisc(rootObject.toString()));</span>
+<span class="fc" id="L148">    }</span>
+
+    @Test
+    void convalidaPrenotazione() throws SQLException, ParseException {
+        //Convalida possibile
+<span class="fc" id="L153">        LocalDateTime dataPerOra = LocalDateTime.now();</span>
+<span class="fc" id="L154">        String data = dataPerOra.getYear() + &quot;-&quot; + dataPerOra.getMonthValue()</span>
+<span class="fc" id="L155">                + &quot;-&quot; + dataPerOra.getDayOfMonth();</span>
+<span class="fc" id="L156">        String now = dataPerOra.getHour() + &quot;:&quot; + dataPerOra.getMinute() + &quot;:&quot; + dataPerOra.getSecond();</span>
+<span class="fc" id="L157">        jsonElement = parser.parse(</span>
+                &quot;{\&quot;newPrenotazioniCf\&quot;:\&quot;DRGMRA99D09A509V\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniOra\&quot;:\&quot;&quot;+now+&quot;\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniIdOp\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniIdS\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioneData\&quot;:\&quot;&quot;+data+&quot;\&quot;}&quot;);
+<span class="fc" id="L163">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L164">        assertTrue(prenotazioneController.newPrenotazione(rootObject.toString()));</span>
+
+<span class="fc" id="L166">        jsonElement = parser.parse(&quot;{\&quot;convalidaPrenotazione\&quot;:\&quot;DRGMRA99D09A509V\&quot;}&quot;);</span>
+<span class="fc" id="L167">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L168">        assertNotNull(prenotazioneController.convalidaPrenotazione(rootObject.toString()));</span>
+
+        //Convalida già eseguita
+<span class="fc" id="L171">        assertNotNull(prenotazioneController.convalidaPrenotazione(rootObject.toString()));</span>
+
+        //Convalida non possibile
+<span class="fc" id="L174">        jsonElement = parser.parse(&quot;{\&quot;convalidaPrenotazione\&quot;:\&quot;CCCNTN98H02F839V\&quot;}&quot;);</span>
+<span class="fc" id="L175">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L176">        assertNotNull(prenotazioneController.convalidaPrenotazione(rootObject.toString()));</span>
+
+        // Convalida troppo presto
+<span class="fc" id="L179">        LocalDateTime dataScadutaLocal = LocalDateTime.now().plusMinutes(40);</span>
+<span class="fc" id="L180">        String presto = dataScadutaLocal.getHour() + &quot;:&quot; + dataScadutaLocal.getMinute() + &quot;:&quot; + dataScadutaLocal.getSecond();</span>
+<span class="fc" id="L181">        jsonElement = parser.parse(</span>
+                &quot;{\&quot;newPrenotazioniCf\&quot;:\&quot;CRLNTN92S15H703Z\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniOra\&quot;:\&quot;&quot;+presto+&quot;\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniIdOp\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniIdS\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioneData\&quot;:\&quot;&quot;+data+&quot;\&quot;}&quot;);
+<span class="fc" id="L187">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L188">        assertTrue(prenotazioneController.newPrenotazione(rootObject.toString()));</span>
+
+<span class="fc" id="L190">        jsonElement = parser.parse(&quot;{\&quot;convalidaPrenotazione\&quot;:\&quot;CRLNTN92S15H703Z\&quot;}&quot;);</span>
+<span class="fc" id="L191">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L192">        assertNotNull(prenotazioneController.convalidaPrenotazione(rootObject.toString()));</span>
+
+        // Convalida troppo tardi
+<span class="fc" id="L195">        LocalDateTime dataTardi = LocalDateTime.now().minusMinutes(25);</span>
+<span class="fc" id="L196">        String troppoTardi = dataTardi.getHour() + &quot;:&quot; + dataTardi.getMinute() + &quot;:&quot; + dataTardi.getSecond();</span>
+<span class="fc" id="L197">        jsonElement = parser.parse(</span>
+                &quot;{\&quot;newPrenotazioniCf\&quot;:\&quot;MNDCMN97R22A509Y\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniOra\&quot;:\&quot;&quot;+troppoTardi+&quot;\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniIdOp\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioniIdS\&quot;:\&quot;1\&quot;,&quot; +
+                        &quot;\&quot;newPrenotazioneData\&quot;:\&quot;&quot;+data+&quot;\&quot;}&quot;);
+<span class="fc" id="L203">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L204">        assertTrue(prenotazioneController.newPrenotazione(rootObject.toString()));</span>
+
+<span class="fc" id="L206">        jsonElement = parser.parse(&quot;{\&quot;convalidaPrenotazione\&quot;:\&quot;MNDCMN97R22A509Y\&quot;}&quot;);</span>
+<span class="fc" id="L207">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L208">        assertNotNull(prenotazioneController.convalidaPrenotazione(rootObject.toString()));</span>
+
+        //Codice Fiscale falso
+<span class="fc" id="L211">        jsonElement = parser.parse(&quot;{\&quot;convalidaPrenotazione\&quot;:\&quot;FALSOHAHA\&quot;}&quot;);</span>
+<span class="fc" id="L212">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L213">        assertNotNull(prenotazioneController.convalidaPrenotazione(rootObject.toString()));</span>
+<span class="fc" id="L214">    }</span>
+
+    @Test
+    void getOrariDisponibili() throws SQLException, ParseException {
+<span class="fc" id="L218">        jsonElement = parser.parse(&quot;{\&quot;idStruttura\&quot;:\&quot;1\&quot;,&quot;</span>
+                + &quot;\&quot;idOperazione\&quot;:\&quot;1\&quot;,&quot;
+                + &quot;\&quot;PrenotazioneData\&quot;:\&quot;2021-01-22\&quot;}&quot;);
+<span class="fc" id="L221">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L222">        assertNotNull(prenotazioneController.getOrariDisponibili(rootObject.toString()));</span>
+<span class="fc" id="L223">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DriverManagerConnectionPoolTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">AppDesktopMedQueue$All_in_AppDesktopMedQueue.exec</a> &gt; <a href="index.source.html" class="el_package">persistence</a> &gt; <span class="el_source">DriverManagerConnectionPoolTest.java</span></div><h1>DriverManagerConnectionPoolTest.java</h1><pre class="source lang-java linenums">package persistence;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="fc" id="L12">class DriverManagerConnectionPoolTest {</span>
+    private static DriverManagerConnectionPool test;
+
+    @BeforeAll
+    public static void startUp(){
+<span class="fc" id="L17">        test=new DriverManagerConnectionPool();</span>
+<span class="fc" id="L18">    }</span>
+
+    @Test
+    void createDbConnection() {
+<span class="fc" id="L22">        assertNotNull(DriverManagerConnectionPool.createDbConnection());</span>
+<span class="fc" id="L23">    }</span>
+
+    @Test
+    void getConnection() throws SQLException {
+<span class="fc" id="L27">        assertNotNull(DriverManagerConnectionPool.getConnection());</span>
+<span class="fc" id="L28">    }</span>
+
+    @Test
+    void releaseConnection() throws SQLException {
+<span class="fc" id="L32">        Connection con=DriverManagerConnectionPool.createDbConnection();</span>
+<span class="fc" id="L33">        DriverManagerConnectionPool.releaseConnection(con);</span>
+<span class="fc" id="L34">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

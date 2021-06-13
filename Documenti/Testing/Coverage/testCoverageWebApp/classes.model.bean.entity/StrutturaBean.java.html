@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StrutturaBean.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.model.bean.entity</a> &gt; <span class="el_source">StrutturaBean.java</span></div><h1>StrutturaBean.java</h1><pre class="source lang-java linenums">package classes.model.bean.entity;
+
+/**
+ * Classe utilizzata per rappresentare l'entità Struttura del DB.
+ */
+public class StrutturaBean {
+
+  private int id;
+  private String nome;
+  private String indirizzo;
+  private String numeroDiTelefono;
+
+  /**
+   * Costruttore dell'oggetto StrutturaBean.
+   *
+   * @param nome nome della struttura
+   * @param indirizzo indirizzo della struttura
+   * @param numeroDiTelefono numero di telefono della struttura
+   */
+<span class="fc" id="L20">  public StrutturaBean(String nome, String indirizzo, String numeroDiTelefono) {</span>
+<span class="fc" id="L21">    this.nome = nome;</span>
+<span class="fc" id="L22">    this.indirizzo = indirizzo;</span>
+<span class="fc" id="L23">    this.numeroDiTelefono = numeroDiTelefono;</span>
+<span class="fc" id="L24">  }</span>
+
+  /**
+   * Costruttore vuoto dell'oggetto StrutturaBean.
+   */
+<span class="fc" id="L29">  public StrutturaBean() {}</span>
+
+  /**
+   * Prelevamento dell'id della struttura.
+   *
+   * @return id della struttura
+   */
+  public int getId() {
+<span class="fc" id="L37">    return id;</span>
+  }
+
+  /**
+   * Impostazione dell'id della struttura.
+   *
+   * @param id nuovo id della struttura
+   */
+  public void setId(int id) {
+<span class="fc" id="L46">    this.id = id;</span>
+<span class="fc" id="L47">  }</span>
+
+  /**
+   * Prelevamento del nome della struttura.
+   *
+   * @return nome della struttura
+   */
+  public String getNome() {
+<span class="fc" id="L55">    return nome;</span>
+  }
+
+  /**
+   * Impostazione del nome della struttura.
+   *
+   * @param nome nuovo nome della struttura
+   */
+  public void setNome(String nome) {
+<span class="fc" id="L64">    this.nome = nome;</span>
+<span class="fc" id="L65">  }</span>
+
+  /**
+   * Prelevamento dell'indirizzo della struttura.
+   *
+   * @return indirizzo della struttura
+   */
+  public String getIndirizzo() {
+<span class="fc" id="L73">    return indirizzo;</span>
+  }
+
+  /**
+   * Impostazione dell'indirizzo della struttura.
+   *
+   * @param indirizzo nuovo indirizzo della struttura
+   */
+  public void setIndirizzo(String indirizzo) {
+<span class="fc" id="L82">    this.indirizzo = indirizzo;</span>
+<span class="fc" id="L83">  }</span>
+
+  /**
+   * Prelevamento numero di telefono della struttura.
+   *
+   * @return numero di telefono della struttura
+   */
+  public String getNumeroDiTelefono() {
+<span class="fc" id="L91">    return numeroDiTelefono;</span>
+  }
+
+  /**
+   * Impostazione numero di telefono della struttura.
+   *
+   * @param numeroDiTelefono nuovo numero di telefono della struttura
+   */
+  public void setNumeroDiTelefono(String numeroDiTelefono) {
+<span class="fc" id="L100">    this.numeroDiTelefono = numeroDiTelefono;</span>
+<span class="fc" id="L101">  }</span>
+
+  /**
+   * Rappresentazione scritta dell'oggetto Struttura.
+   *
+   * @return Stringa con tutti i campi dell'oggetto
+   */
+  @Override
+  public String toString() {
+<span class="nc" id="L110">    return &quot;StrutturaBean{&quot;</span>
+        + &quot;id=&quot;
+        + id
+        + &quot;, nome='&quot;
+        + nome
+        + '\''
+        + &quot;, indirizzo='&quot;
+        + indirizzo
+        + '\''
+        + &quot;, numeroDiTelefono='&quot;
+        + numeroDiTelefono
+        + '\''
+        + '}';
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

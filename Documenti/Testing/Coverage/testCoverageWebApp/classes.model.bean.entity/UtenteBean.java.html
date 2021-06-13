@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UtenteBean.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.model.bean.entity</a> &gt; <span class="el_source">UtenteBean.java</span></div><h1>UtenteBean.java</h1><pre class="source lang-java linenums">package classes.model.bean.entity;
+
+import java.sql.Date;
+
+/**
+ * Classe utilizzata per rappresentare l'entità Utente del DB.
+ */
+public class UtenteBean {
+
+  private String codiceFiscale;
+  private String password;
+  private String nome;
+  private String cognome;
+  private Date dataDiNascita;
+  private String email;
+  private String numeroDiTelefono;
+
+  /**
+   * Costruttore dell'oggetto UtenteBean.
+   *
+   * @param codiceFiscale chiave primaria dell'utente
+   * @param password password dell'utente
+   * @param nome nome dell'utente
+   * @param cognome cognome dell'utente
+   * @param dataDiNascita data di nascita dell'utente
+   * @param email email dell'utente
+   * @param numeroDiTelefono numero di telefono dell'utente
+   */
+  public UtenteBean(
+      String codiceFiscale,
+      String password,
+      String nome,
+      String cognome,
+      java.sql.Date dataDiNascita,
+      String email,
+<span class="fc" id="L36">      String numeroDiTelefono) {</span>
+<span class="fc" id="L37">    this.codiceFiscale = codiceFiscale;</span>
+<span class="fc" id="L38">    this.password = password;</span>
+<span class="fc" id="L39">    this.nome = nome;</span>
+<span class="fc" id="L40">    this.cognome = cognome;</span>
+<span class="fc" id="L41">    this.dataDiNascita = dataDiNascita;</span>
+<span class="fc" id="L42">    this.email = email;</span>
+<span class="fc" id="L43">    this.numeroDiTelefono = numeroDiTelefono;</span>
+<span class="fc" id="L44">  }</span>
+
+  /**
+   * Costruttore vuoto dell'oggetto UtenteBean.
+   */
+<span class="fc" id="L49">  public UtenteBean() {}</span>
+
+  /**
+   * Prelevamento del codice fiscale dell'utente.
+   *
+   * @return codice fiscale dell'utente
+   */
+  public String getCodiceFiscale() {
+<span class="fc" id="L57">    return codiceFiscale;</span>
+  }
+
+  /**
+   * Impostazione codice fiscale dell'utente.
+   *
+   * @param codiceFiscale nuovo codice fiscale dell'utente
+   */
+  public void setCodiceFiscale(String codiceFiscale) {
+<span class="fc" id="L66">    this.codiceFiscale = codiceFiscale;</span>
+<span class="fc" id="L67">  }</span>
+
+  /**
+   * Prelevamento della password dell'utente.
+   *
+   * @return password dell'utente
+   */
+  public String getPassword() {
+<span class="fc" id="L75">    return password;</span>
+  }
+
+  /**
+   * Impostazione della password dell'utente.
+   *
+   * @param password nuova password dell'utente
+   */
+  public void setPassword(String password) {
+<span class="fc" id="L84">    this.password = password;</span>
+<span class="fc" id="L85">  }</span>
+
+  /**
+   * Prelevamento del nome dell'utente.
+   *
+   * @return nome dell'utente
+   */
+  public String getNome() {
+<span class="fc" id="L93">    return nome;</span>
+  }
+
+  /**
+   * Impostazione nome dell'utente.
+   *
+   * @param nome nuovo nome dell'utente
+   */
+  public void setNome(String nome) {
+<span class="fc" id="L102">    this.nome = nome;</span>
+<span class="fc" id="L103">  }</span>
+
+  /**
+   * Prelevamento del cognome dell'utente.
+   *
+   * @return cognome dell'utente
+   */
+  public String getCognome() {
+<span class="fc" id="L111">    return cognome;</span>
+  }
+
+  /**
+   * Impostazione cognome dell'utente.
+   *
+   * @param cognome nuovo cognome dell'utente.
+   */
+  public void setCognome(String cognome) {
+<span class="fc" id="L120">    this.cognome = cognome;</span>
+<span class="fc" id="L121">  }</span>
+
+  /**
+   * Prelevamento della data di nascita dell'utente.
+   *
+   * @return data di nascita dell'utente
+   */
+  public java.sql.Date getDataDiNascita() {
+<span class="fc" id="L129">    return dataDiNascita;</span>
+  }
+
+  /**
+   * Impostazione della data di nascita dell'utente.
+   *
+   * @param dataDiNascita nuova data di nascita dell'utente
+   */
+  public void setDataDiNascita(Date dataDiNascita) {
+<span class="fc" id="L138">    this.dataDiNascita = dataDiNascita;</span>
+<span class="fc" id="L139">  }</span>
+
+  /**
+   * Prelevamento email dell'utente.
+   *
+   * @return email dell'utente
+   */
+  public String getEmail() {
+<span class="fc" id="L147">    return email;</span>
+  }
+
+  /**
+   * Impostazione email dell'utente.
+   *
+   * @param email nuova email dell'utente
+   */
+  public void setEmail(String email) {
+<span class="fc" id="L156">    this.email = email;</span>
+<span class="fc" id="L157">  }</span>
+
+  /**
+   * Prelevamento del numero di telefono dell'utente.
+   *
+   * @return numero di telefono dell'utente
+   */
+  public String getNumeroDiTelefono() {
+<span class="fc" id="L165">    return numeroDiTelefono;</span>
+  }
+
+  /**
+   * Impostazione del numero di telefono dell'utente.
+   *
+   * @param numeroDiTelefono nuovo numero di telefono dell'utente
+   */
+  public void setNumeroDiTelefono(String numeroDiTelefono) {
+<span class="fc" id="L174">    this.numeroDiTelefono = numeroDiTelefono;</span>
+<span class="fc" id="L175">  }</span>
+
+  /**
+   * Rappresentazione scritta dell'oggetto Utente.
+   *
+   * @return Stringa con tutti i campi dell'oggetto
+   */
+  @Override
+  public String toString() {
+<span class="nc" id="L184">    return &quot;UtenteBean{&quot;</span>
+        + &quot;codiceFiscale='&quot;
+        + codiceFiscale
+        + '\''
+        + &quot;, password='&quot;
+        + password
+        + '\''
+        + &quot;, nome='&quot;
+        + nome
+        + '\''
+        + &quot;, cognome='&quot;
+        + cognome
+        + '\''
+        + &quot;, dataDiNascita=&quot;
+        + dataDiNascita
+        + &quot;, email='&quot;
+        + email
+        + '\''
+        + &quot;, numeroDiTelefono=&quot;
+        + numeroDiTelefono
+        + '}';
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

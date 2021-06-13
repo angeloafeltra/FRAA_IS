@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AmbulatorioControllerTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.controller</a> &gt; <span class="el_source">AmbulatorioControllerTest.java</span></div><h1>AmbulatorioControllerTest.java</h1><pre class="source lang-java linenums">package classes.controller;
+
+import classes.controller.exception.ErrorNewObjectException;
+import classes.controller.exception.InvalidKeyException;
+import classes.controller.exception.ObjectNotFoundException;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.junit.jupiter.api.Test;
+
+import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="fc" id="L15">class AmbulatorioControllerTest {</span>
+<span class="fc" id="L16">    private JsonParser parser = new JsonParser();</span>
+<span class="fc" id="L17">    private AmbulatorioController ambulatorioController = new AmbulatorioController();</span>
+    private JsonElement jsonElement;
+    private JsonObject rootObject;
+
+    @Test
+    void getById() throws SQLException, InvalidKeyException {
+<span class="fc" id="L23">        jsonElement = parser.parse(&quot;{\&quot;id\&quot;:\&quot;1\&quot;}&quot;);</span>
+<span class="fc" id="L24">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L25">        assertNotNull(ambulatorioController.getById(rootObject.toString()));</span>
+
+<span class="fc" id="L27">        jsonElement = parser.parse(&quot;{\&quot;id\&quot;:\&quot;0\&quot;}&quot;);</span>
+<span class="fc" id="L28">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L29">        rootObject = rootObject;</span>
+<span class="fc" id="L30">        InvalidKeyException invalidKeyException = assertThrows(InvalidKeyException.class, () -&gt; {</span>
+<span class="nc" id="L31">            ambulatorioController.getById(rootObject.toString());</span>
+<span class="nc" id="L32">        });</span>
+
+<span class="fc" id="L34">        jsonElement = parser.parse(&quot;{\&quot;id\&quot;:\&quot;54564163\&quot;}&quot;);</span>
+<span class="fc" id="L35">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L36">        rootObject = rootObject;</span>
+<span class="fc" id="L37">        ObjectNotFoundException objectNotFoundException = assertThrows(ObjectNotFoundException.class, () -&gt; {</span>
+<span class="nc" id="L38">            ambulatorioController.getById(rootObject.toString());</span>
+<span class="nc" id="L39">        });</span>
+<span class="fc" id="L40">    }</span>
+
+    @Test
+    void getAllAmbulatori() throws SQLException {
+<span class="fc" id="L44">        jsonElement = parser.parse(&quot;{\&quot;ordineAmbulatori\&quot;:\&quot;idStruttura\&quot;}&quot;);</span>
+<span class="fc" id="L45">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L46">        ambulatorioController.getAllAmbulatori(rootObject.toString());</span>
+
+<span class="fc" id="L48">        jsonElement = parser.parse(&quot;{\&quot;ordineAmbulatori\&quot;:\&quot;\&quot;}&quot;);</span>
+<span class="fc" id="L49">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L50">        assertNotNull(ambulatorioController.getAllAmbulatori(rootObject.toString()));</span>
+<span class="fc" id="L51">    }</span>
+
+    @Test
+    void newAmbulatorio() throws SQLException {
+<span class="fc" id="L55">        jsonElement = parser.parse(</span>
+                &quot;{\&quot;newAmbulatorioNome\&quot;:\&quot;NewAmbulatorio\&quot;,\&quot;newAmbulatorioIdS\&quot;:\&quot;1\&quot;}&quot;);
+<span class="fc" id="L57">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L58">        assertTrue(ambulatorioController.newAmbulatorio(rootObject.toString()));</span>
+
+<span class="fc" id="L60">        jsonElement = parser.parse(</span>
+                &quot;{\&quot;newAmbulatorioNome\&quot;:\&quot;NomeErrato1245\&quot;,\&quot;newAmbulatorioIdS\&quot;:\&quot;1\&quot;}&quot;);
+<span class="fc" id="L62">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L63">        ErrorNewObjectException errorNewObjectException = assertThrows(ErrorNewObjectException.class, () -&gt; {</span>
+<span class="nc" id="L64">            ambulatorioController.newAmbulatorio(rootObject.toString());</span>
+<span class="nc" id="L65">        });</span>
+<span class="fc" id="L66">    }</span>
+
+    @Test
+    void updateAmbulatorio() throws SQLException {
+<span class="fc" id="L70">        jsonElement = parser.parse(</span>
+                &quot;{\&quot;idAmbulatorioUpdate\&quot;:\&quot;1\&quot;,\&quot;&quot;
+                        + &quot;AmbulatoriUpdateName\&quot;:\&quot;Ortopedia Infantile\&quot;,\&quot;&quot;
+                        + &quot;AmbulatoriUpdateIdStruttura\&quot;:\&quot;1\&quot;}&quot;);
+<span class="fc" id="L74">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L75">        assertTrue(ambulatorioController.updateAmbulatorio(rootObject.toString()));</span>
+
+<span class="fc" id="L77">        jsonElement = parser.parse(</span>
+                &quot;{\&quot;idAmbulatorioUpdate\&quot;:\&quot;1\&quot;,\&quot;&quot;
+                        + &quot;AmbulatoriUpdateName\&quot;:\&quot;Errore 12\&quot;,\&quot;&quot;
+                        + &quot;AmbulatoriUpdateIdStruttura\&quot;:\&quot;21341\&quot;}&quot;);
+<span class="fc" id="L81">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L82">        assertFalse(ambulatorioController.updateAmbulatorio(rootObject.toString()));</span>
+
+<span class="fc" id="L84">        jsonElement = parser.parse(</span>
+                &quot;{\&quot;idAmbulatorioUpdate\&quot;:\&quot;784524\&quot;,\&quot;&quot;
+                        + &quot;AmbulatoriUpdateName\&quot;:\&quot;Ortopedia Infantile\&quot;,\&quot;&quot;
+                        + &quot;AmbulatoriUpdateIdStruttura\&quot;:\&quot;1\&quot;}&quot;);
+<span class="fc" id="L88">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L89">        ObjectNotFoundException objectNotFoundException = assertThrows(ObjectNotFoundException.class, () -&gt; {</span>
+<span class="nc" id="L90">            ambulatorioController.updateAmbulatorio(rootObject.toString());</span>
+<span class="nc" id="L91">        });</span>
+<span class="fc" id="L92">    }</span>
+
+    @Test
+    void deleteAmbulatorio() throws SQLException {
+<span class="fc" id="L96">        jsonElement = parser.parse(&quot;{\&quot;idAmbulatorioRemove\&quot;:\&quot;11\&quot;}&quot;);</span>
+<span class="fc" id="L97">        rootObject = jsonElement.getAsJsonObject();</span>
+<span class="fc" id="L98">        ambulatorioController.deleteAmbulatorio(rootObject.toString());</span>
+<span class="fc" id="L99">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

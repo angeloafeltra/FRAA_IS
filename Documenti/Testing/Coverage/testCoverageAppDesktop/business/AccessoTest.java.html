@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccessoTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">AppDesktopMedQueue$All_in_AppDesktopMedQueue.exec</a> &gt; <a href="index.source.html" class="el_package">business</a> &gt; <span class="el_source">AccessoTest.java</span></div><h1>AccessoTest.java</h1><pre class="source lang-java linenums">package business;
+
+import bean.ImpiegatoBean;
+import bean.PrenotazioneBean;
+import eccezioni.InvalidKeyException;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.sql.Date;
+import java.sql.Time;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="fc" id="L14">class AccessoTest {</span>
+<span class="fc" id="L15">  private static Accesso test=new Accesso();</span>
+
+  @BeforeAll
+  public static void setUp(){
+
+<span class="fc" id="L20">  }</span>
+
+
+  @Test
+  void AutenticazioneImpiegato_CodiceFiscale_NonValido_1()  {
+<span class="fc" id="L25">    assertNull(test.verificaCredenziali(&quot;mario&quot;, null));</span>
+<span class="fc" id="L26">  }</span>
+
+  @Test
+  void AutenticazioneImpiegato_CodiceFiscale_NonEsistenteNelDatabase_2() {
+<span class="fc" id="L30">    assertNull(test.verificaCredenziali(&quot;MNDCMN97R22A509S&quot;, null));</span>
+<span class="fc" id="L31">  }</span>
+
+  @Test
+  void AutenticazioneImpiegato_Password_NonRispettaIlFormato_3() {
+<span class="fc" id="L35">    assertNull(test.verificaCredenziali(&quot;FLTNGL99A14L845J&quot;, &quot;a&quot;));</span>
+<span class="fc" id="L36">  }</span>
+
+  @Test
+  void AutenticazioneImpiegato_Password_Errata_4() {
+<span class="fc" id="L40">    assertNull(test.verificaCredenziali(&quot;FLTNGL99A14L845J&quot;, &quot;angelo9&quot;));</span>
+<span class="fc" id="L41">  }</span>
+
+  @Test
+  void AutenticazioneImpiegato_Successo_5() {
+<span class="fc" id="L45">    String strdate=&quot;1999-01-14&quot;;</span>
+<span class="fc" id="L46">    Date data=Date.valueOf(strdate);</span>
+<span class="fc" id="L47">    ImpiegatoBean impiegato=new ImpiegatoBean(&quot;FLTNGL99A14L845J&quot;,&quot;angelo99&quot;,&quot;angelo&quot;,&quot;afeltra&quot;,data,&quot;a.afeltra12@studenti.unisa.it&quot;,&quot;3394487295&quot;,1);</span>
+<span class="fc" id="L48">    assertEquals(impiegato,test.verificaCredenziali(&quot;FLTNGL99A14L845J&quot;, &quot;angelo99&quot;));</span>
+<span class="fc" id="L49">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

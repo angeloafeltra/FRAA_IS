@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PrenotazioneBean.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.model.bean.entity</a> &gt; <span class="el_source">PrenotazioneBean.java</span></div><h1>PrenotazioneBean.java</h1><pre class="source lang-java linenums">package classes.model.bean.entity;
+
+import java.sql.Date;
+
+/**
+ * Classe utilizzata per rappresentare l'entità Impiegato del DB.
+ */
+public class PrenotazioneBean {
+
+  private int id;
+  private String ora;
+  private Date dataPrenotazione;
+  private String codiceFiscale;
+  private int idOperazione;
+  private int idStruttura;
+  private boolean convalida;
+
+  /**
+   * Costruttore dell'oggetto PrenotazioneBean.
+   *
+   * @param ora Ora della prenotazione
+   * @param data Data della prenotazione
+   * @param codiceFiscale chiave esterna dell'utente prenotato
+   * @param idOp chiave esterna della prenotazione
+   * @param idSt chiave esterna della struttura
+   * @param convalida controllo se la convalida è avvenuta
+   */
+  public PrenotazioneBean(
+<span class="fc" id="L29">      String ora, Date data, String codiceFiscale, int idOp, int idSt, boolean convalida) {</span>
+<span class="fc" id="L30">    this.ora = ora;</span>
+<span class="fc" id="L31">    this.dataPrenotazione = data;</span>
+<span class="fc" id="L32">    this.codiceFiscale = codiceFiscale;</span>
+<span class="fc" id="L33">    this.idOperazione = idOp;</span>
+<span class="fc" id="L34">    this.idStruttura = idSt;</span>
+<span class="fc" id="L35">    this.convalida = convalida;</span>
+<span class="fc" id="L36">  }</span>
+
+  /**
+   * Costruttore vuoto dell'oggetto PrenotazioneBean.
+   */
+<span class="fc" id="L41">  public PrenotazioneBean() {}</span>
+
+  /**
+   * Prelevamento dell'id della prentoazione.
+   *
+   * @return id della prentoazione
+   */
+  public int getId() {
+<span class="fc" id="L49">    return id;</span>
+  }
+
+  /**
+   * Impostazione dell'id della prenotazione.
+   *
+   * @param id nuovo id della prenotazione
+   */
+  public void setId(int id) {
+<span class="fc" id="L58">    this.id = id;</span>
+<span class="fc" id="L59">  }</span>
+
+  /**
+   * Prelevamento ora della prenotazione.
+   *
+   * @return ora della prenotazione
+   */
+  public String getOra() {
+<span class="fc" id="L67">    return ora;</span>
+  }
+
+  /**
+   * Impostazione dell'ora della prenotazione.
+   *
+   * @param ora nuova ora della prenotazione
+   */
+  public void setOra(String ora) {
+<span class="fc" id="L76">    this.ora = ora;</span>
+<span class="fc" id="L77">  }</span>
+
+  /**
+   * Prelevamento della data della prenotazione.
+   *
+   * @return data della prenotazione
+   */
+  public Date getDataPrenotazione() {
+<span class="fc" id="L85">    return dataPrenotazione;</span>
+  }
+
+  /**
+   * Impostazione data della prenotazione.
+   *
+   * @param data nuova data della prenotazione
+   */
+  public void setDataPrenotazione(Date data) {
+<span class="fc" id="L94">    this.dataPrenotazione = data;</span>
+<span class="fc" id="L95">  }</span>
+
+  /**
+   * Prelevamento della chiave esterna dell'utente.
+   *
+   * @return chiave esterna dell'utente
+   */
+  public String getCodiceFiscale() {
+<span class="fc" id="L103">    return codiceFiscale;</span>
+  }
+
+  /**
+   * Impostazione della chiave esterna dell'utente.
+   *
+   * @param codiceFiscale chiave esterna dell'utente
+   */
+  public void setCodiceFiscale(String codiceFiscale) {
+<span class="fc" id="L112">    this.codiceFiscale = codiceFiscale;</span>
+<span class="fc" id="L113">  }</span>
+
+  /**
+   * Prelevamento della chiave esterna dell'operazione.
+   *
+   * @return chiave esterna dell'operazione
+   */
+  public int getIdOperazione() {
+<span class="fc" id="L121">    return idOperazione;</span>
+  }
+
+  /**
+   * Impostazione della chiave esterna dell'operazione.
+   *
+   * @param idOp nuova chiave esterna dell'operazione
+   */
+  public void setIdOperazione(int idOp) {
+<span class="fc" id="L130">    this.idOperazione = idOp;</span>
+<span class="fc" id="L131">  }</span>
+
+  /**
+   * Prelevamento della chiave esterna della struttura.
+   *
+   * @return chiave esterna della struttura
+   */
+  public int getIdStruttura() {
+<span class="fc" id="L139">    return idStruttura;</span>
+  }
+
+  /**
+   * Impostazione della chiave esterna della struttura.
+   *
+   * @param idSt nuova chiave esterna della struttura
+   */
+  public void setIdStruttura(int idSt) {
+<span class="fc" id="L148">    this.idStruttura = idSt;</span>
+<span class="fc" id="L149">  }</span>
+
+  /**
+   * Prelevamento della convalida.
+   *
+   * @return convalida
+   */
+  public boolean isConvalida() {
+<span class="fc" id="L157">    return convalida;</span>
+  }
+
+  /**
+   * Impostazione della convalida.
+   *
+   * @param convalida nuova convalida
+   */
+  public void setConvalida(boolean convalida) {
+<span class="fc" id="L166">    this.convalida = convalida;</span>
+<span class="fc" id="L167">  }</span>
+
+  /**
+   * Rappresentazione scritta dell'oggetto Prenotazione.
+   *
+   * @return Stringa con tutti i campi dell'oggetto
+   */
+  @Override
+  public String toString() {
+<span class="nc" id="L176">    return &quot;PrenotazioneBean{&quot;</span>
+        + &quot;id=&quot;
+        + id
+        + &quot;, ora='&quot;
+        + ora
+        + '\''
+        + &quot;, dataPrenotazione=&quot;
+        + dataPrenotazione
+        + &quot;, codiceFiscale='&quot;
+        + codiceFiscale
+        + '\''
+        + &quot;, idOperazione=&quot;
+        + idOperazione
+        + &quot;, idStruttura=&quot;
+        + idStruttura
+        + &quot;, convalida=&quot;
+        + convalida
+        + '}';
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

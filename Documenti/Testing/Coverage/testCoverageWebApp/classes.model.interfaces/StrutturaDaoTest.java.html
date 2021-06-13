@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StrutturaDaoTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.model.interfaces</a> &gt; <span class="el_source">StrutturaDaoTest.java</span></div><h1>StrutturaDaoTest.java</h1><pre class="source lang-java linenums">package classes.model.interfaces;
+
+import classes.model.bean.entity.StrutturaBean;
+import classes.model.dao.StrutturaModel;
+import org.junit.jupiter.api.Test;
+
+import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="fc" id="L11">class StrutturaDaoTest {</span>
+<span class="fc" id="L12">    private StrutturaModel strutturaModel = new StrutturaModel();</span>
+<span class="fc" id="L13">    private StrutturaBean strutturaBean = new StrutturaBean();</span>
+
+    @Test
+    void doRetrieveByKey() throws SQLException {
+<span class="fc" id="L17">        assertNotNull(strutturaModel.doRetrieveByKey(1));</span>
+<span class="fc" id="L18">        assertNull(strutturaModel.doRetrieveByKey(1900428));</span>
+<span class="fc" id="L19">    }</span>
+
+    @Test
+    void doRetrieveByName() throws SQLException {
+<span class="fc" id="L23">        assertNotNull(strutturaModel.doRetrieveByName(&quot;San Leonardo&quot;));</span>
+<span class="fc" id="L24">    }</span>
+
+    @Test
+    void doRetrieveAll() throws SQLException {
+<span class="fc" id="L28">        assertNotNull(strutturaModel.doRetrieveAll(&quot;&quot;));</span>
+<span class="fc" id="L29">    }</span>
+
+    @Test
+    void doSave() throws SQLException {
+<span class="fc" id="L33">        strutturaBean.setIndirizzo(&quot;Via Ababudoju&quot;);</span>
+<span class="fc" id="L34">        strutturaBean.setNome(&quot;Ababudoju Center&quot;);</span>
+<span class="fc" id="L35">        strutturaBean.setNumeroDiTelefono(&quot;0874878584&quot;);</span>
+<span class="fc" id="L36">        strutturaModel.doSave(strutturaBean);</span>
+<span class="fc" id="L37">    }</span>
+
+    @Test
+    void doUpdate() throws SQLException {
+<span class="fc" id="L41">        strutturaBean = strutturaModel.doRetrieveByName(&quot;Ababudoju Center&quot;);</span>
+<span class="fc" id="L42">        strutturaBean.setNome(&quot;Rehab Center&quot;);</span>
+<span class="fc" id="L43">        strutturaBean.setIndirizzo(&quot;Via Shady Slim 12&quot;);</span>
+<span class="fc" id="L44">        strutturaModel.doUpdate(strutturaBean);</span>
+<span class="fc" id="L45">    }</span>
+
+    @Test
+    void doDelete() throws SQLException {
+<span class="fc" id="L49">        strutturaBean = strutturaModel.doRetrieveByName(&quot;Da Rimuovere Dao&quot;);</span>
+<span class="fc" id="L50">        strutturaModel.doDelete(strutturaBean);</span>
+<span class="fc" id="L51">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

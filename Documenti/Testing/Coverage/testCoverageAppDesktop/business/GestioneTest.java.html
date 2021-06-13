@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GestioneTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">AppDesktopMedQueue$All_in_AppDesktopMedQueue.exec</a> &gt; <a href="index.source.html" class="el_package">business</a> &gt; <span class="el_source">GestioneTest.java</span></div><h1>GestioneTest.java</h1><pre class="source lang-java linenums">package business;
+
+import bean.OperazioneBean;
+import bean.PrenotazioneBean;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.sql.Date;
+import java.sql.Time;
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="fc" id="L14">class GestioneTest {</span>
+  private static Gestione test;
+
+
+  @BeforeAll
+  public static void setUp() {
+<span class="fc" id="L20">    test = new Gestione();</span>
+<span class="fc" id="L21">  }</span>
+
+  @Test
+  void accettazionePrenotazione_CodaNonSelezionata_1() {
+<span class="fc" id="L25">    assertNull(test.accettaPrenotazione(null,null));</span>
+<span class="fc" id="L26">  }</span>
+
+  @Test
+  void accettazionePrenotazione_PrenotazioneNonAccettata_2() {
+<span class="fc" id="L30">    assertNull(test.accettaPrenotazione(1,null));</span>
+<span class="fc" id="L31">  }</span>
+
+  @Test
+  void accettazionePrenotazione_PrenotazioneAccettata_3() {
+<span class="fc" id="L35">    String str = &quot;2021-03-22&quot;;</span>
+<span class="fc" id="L36">    String str1 = &quot;12:00:00&quot;;</span>
+<span class="fc" id="L37">    Date date = Date.valueOf(str);</span>
+<span class="fc" id="L38">    Time time = Time.valueOf(str1);</span>
+<span class="fc" id="L39">    PrenotazioneBean p = new PrenotazioneBean(3, date, time, true, &quot;CRLNTN92S15H703Q&quot;, 2, 1);</span>
+<span class="fc" id="L40">    assertEquals(p,test.accettaPrenotazione(2,1));</span>
+<span class="fc" id="L41">  }</span>
+
+  @Test
+  void accettaPrenotazione_idNonValido(){
+<span class="fc" id="L45">    assertNull(test.accettaPrenotazione(-1,-1));</span>
+<span class="fc" id="L46">  }</span>
+
+  @Test
+  void getNumeroPrenotazioni_idNonValido(){
+<span class="fc" id="L50">    assertEquals(0,test.getNumPrenotazioni(0,0));</span>
+<span class="fc" id="L51">  }</span>
+
+  @Test
+  void getNumeroPrenotazioni_idValidoNonTrovato(){
+<span class="fc" id="L55">    assertEquals(0,test.getNumPrenotazioni(99,99));</span>
+<span class="fc" id="L56">  }</span>
+
+  @Test
+  void getNumeroPrenotazioni_idValido(){
+<span class="fc" id="L60">    assertNotNull(test.getNumPrenotazioni(1,1));</span>
+<span class="fc" id="L61">  }</span>
+
+  @Test
+  void getListaOperazioni(){
+<span class="fc" id="L65">    ArrayList&lt;OperazioneBean&gt; result=new ArrayList&lt;OperazioneBean&gt;();</span>
+<span class="fc" id="L66">    result.add(new OperazioneBean(1, &quot;Pagamento Ticket&quot;, &quot;Pagamento Ticket per visita medica&quot;));</span>
+<span class="fc" id="L67">    result.add(new OperazioneBean(2, &quot;Prenotazione Ambulatorio&quot;, &quot;Richiesta prenotazione ambulatorio&quot;));</span>
+<span class="fc" id="L68">    result.add(new OperazioneBean(3, &quot;Da Rimuovere Dao&quot;, &quot;Da rimuovere dao&quot;));</span>
+<span class="fc" id="L69">    result.add(new OperazioneBean(4, &quot;Da Rimuovere Controller&quot;, &quot;Da rimuovere Controller&quot;));</span>
+<span class="fc" id="L70">    assertEquals(result,test.getListaOperazioni());</span>
+<span class="fc" id="L71">  }</span>
+
+  @Test
+  void getOperazione_idNonValido(){
+<span class="fc" id="L75">    assertNull(test.getOperazione(0));</span>
+<span class="fc" id="L76">  }</span>
+
+  @Test
+  void getOperazione_idValidoNonTrovato(){
+<span class="fc" id="L80">    assertNull(test.getOperazione(99));</span>
+<span class="fc" id="L81">  }</span>
+
+  @Test
+  void getOperazione_idValido(){
+<span class="fc" id="L85">    OperazioneBean o =</span>
+            new OperazioneBean(1, &quot;Pagamento Ticket&quot;, &quot;Pagamento Ticket per visita medica&quot;);
+<span class="fc" id="L87">    assertEquals(o, test.getOperazione(1));</span>
+<span class="fc" id="L88">  }</span>
+
+    @Test
+    void deletePrenotazioniScadute() {
+<span class="fc" id="L92">    assertEquals(0,test.deletePrenotazioniScadute());</span>
+<span class="fc" id="L93">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

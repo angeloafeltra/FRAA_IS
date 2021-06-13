@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UtenteModel.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.model.dao</a> &gt; <span class="el_source">UtenteModel.java</span></div><h1>UtenteModel.java</h1><pre class="source lang-java linenums">package classes.model.dao;
+
+import classes.model.DriverManagerConnectionPool;
+import classes.model.bean.entity.UtenteBean;
+import classes.model.interfaces.UtenteDaoInterface;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.LinkedList;
+
+/**
+ * Model per collegare la tabella &quot;Utente&quot; al backend.
+ */
+<span class="fc" id="L16">public class UtenteModel implements UtenteDaoInterface {</span>
+  private static final String nomeTabella = &quot;medqueue.utente&quot;;
+
+  /**
+   * Prelevamento singolo utente.
+   *
+   * @param cf chiave primaria dell'utente
+   * @return Utente avente quel codice fiscale
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public UtenteBean doRetrieveByKey(String cf) throws SQLException {
+<span class="fc" id="L28">    Connection con = null;</span>
+<span class="fc" id="L29">    PreparedStatement ps = null;</span>
+
+<span class="fc" id="L31">    UtenteBean tmp = new UtenteBean();</span>
+
+<span class="fc" id="L33">    String selectSql = &quot;SELECT * FROM &quot; + nomeTabella + &quot; WHERE codiceFiscale = ?&quot;;</span>
+
+    try {
+<span class="fc" id="L36">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L37">      ps = con.prepareStatement(selectSql);</span>
+<span class="fc" id="L38">      ps.setString(1, cf);</span>
+
+<span class="fc" id="L40">      ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc bfc" id="L42" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L43">        tmp.setCodiceFiscale(rs.getString(&quot;codiceFiscale&quot;));</span>
+<span class="fc" id="L44">        tmp.setPassword(rs.getString(&quot;password&quot;));</span>
+<span class="fc" id="L45">        tmp.setNome(rs.getString(&quot;nome&quot;));</span>
+<span class="fc" id="L46">        tmp.setCognome(rs.getString(&quot;cognome&quot;));</span>
+<span class="fc" id="L47">        tmp.setDataDiNascita(rs.getDate(&quot;dataDiNascita&quot;));</span>
+<span class="fc" id="L48">        tmp.setEmail(rs.getString(&quot;indirizzoEmail&quot;));</span>
+<span class="fc" id="L49">        tmp.setNumeroDiTelefono(rs.getString(&quot;numeroDiTelefono&quot;));</span>
+      }
+<span class="nc" id="L51">    } catch (SQLException e) {</span>
+<span class="nc" id="L52">      e.printStackTrace();</span>
+    } finally {
+      try {
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">        if (ps != null) {</span>
+<span class="fc" id="L56">          ps.close();</span>
+        }
+      } finally {
+<span class="fc" id="L59">        DriverManagerConnectionPool.releaseConnection(con);</span>
+      }
+    }
+
+<span class="fc bfc" id="L63" title="All 2 branches covered.">    if (tmp.getCodiceFiscale() != null) {</span>
+<span class="fc" id="L64">      return tmp;</span>
+    } else {
+<span class="fc" id="L66">      return null;</span>
+    }
+  }
+
+  /**
+   * Prelevamento di tutti gli utenti presenti nel DB.
+   *
+   * @param order Ordine per la visualizzazione della collezione
+   * @return Collezione di utenti
+   * @throws SQLException cf per problemi di esecuzione della query
+   */
+  @Override
+  public Collection&lt;UtenteBean&gt; doRetrieveAll(String order) throws SQLException {
+<span class="fc" id="L79">    Connection con = null;</span>
+<span class="fc" id="L80">    PreparedStatement ps = null;</span>
+
+<span class="fc" id="L82">    Collection&lt;UtenteBean&gt; result = new LinkedList&lt;UtenteBean&gt;();</span>
+
+<span class="fc" id="L84">    String selectSql = &quot;SELECT * FROM &quot; + nomeTabella;</span>
+
+<span class="pc bpc" id="L86" title="1 of 4 branches missed.">    if (order != null &amp;&amp; !order.equals(&quot;&quot;)) {</span>
+<span class="fc" id="L87">      selectSql += &quot; ORDER BY &quot; + order;</span>
+    }
+
+    try {
+
+<span class="fc" id="L92">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L93">      ps = con.prepareStatement(selectSql);</span>
+
+<span class="fc" id="L95">      ResultSet rs = ps.executeQuery();</span>
+
+
+<span class="fc bfc" id="L98" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L99">        UtenteBean tmp = new UtenteBean();</span>
+<span class="fc" id="L100">        tmp.setCodiceFiscale(rs.getString(&quot;codiceFiscale&quot;));</span>
+<span class="fc" id="L101">        tmp.setPassword(rs.getString(&quot;password&quot;));</span>
+<span class="fc" id="L102">        tmp.setNome(rs.getString(&quot;nome&quot;));</span>
+<span class="fc" id="L103">        tmp.setCognome(rs.getString(&quot;cognome&quot;));</span>
+<span class="fc" id="L104">        tmp.setDataDiNascita(rs.getDate(&quot;dataDiNascita&quot;));</span>
+<span class="fc" id="L105">        tmp.setEmail(rs.getString(&quot;indirizzoEmail&quot;));</span>
+<span class="fc" id="L106">        tmp.setNumeroDiTelefono(rs.getString(&quot;numeroDiTelefono&quot;));</span>
+<span class="fc" id="L107">        result.add(tmp);</span>
+<span class="fc" id="L108">      }</span>
+
+<span class="nc" id="L110">    } catch (SQLException e) {</span>
+<span class="nc" id="L111">      e.printStackTrace();</span>
+    } finally {
+      try {
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">        if (ps != null) {</span>
+<span class="fc" id="L115">          ps.close();</span>
+        }
+      } finally {
+<span class="fc" id="L118">        DriverManagerConnectionPool.releaseConnection(con);</span>
+      }
+    }
+
+<span class="fc" id="L122">    return result;</span>
+  }
+
+  /**
+   * Inserimento nuovo utente nel DB.
+   *
+   * @param param Nuovo Utente
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public void doSave(UtenteBean param) throws SQLException {
+<span class="fc" id="L133">    Connection connection = null;</span>
+<span class="fc" id="L134">    PreparedStatement preparedStatement = null;</span>
+
+<span class="fc" id="L136">    String insertSql = &quot;INSERT INTO &quot; + nomeTabella + &quot; VALUES (?, ?, ?, ?, ?, ?, ?)&quot;;</span>
+
+    try {
+<span class="fc" id="L139">      connection = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L140">      preparedStatement = connection.prepareStatement(insertSql);</span>
+<span class="fc" id="L141">      preparedStatement.setString(1, param.getCodiceFiscale());</span>
+<span class="fc" id="L142">      preparedStatement.setString(2, param.getPassword());</span>
+<span class="fc" id="L143">      preparedStatement.setString(3, param.getNome());</span>
+<span class="fc" id="L144">      preparedStatement.setString(4, param.getCognome());</span>
+<span class="fc" id="L145">      preparedStatement.setDate(5, param.getDataDiNascita());</span>
+<span class="fc" id="L146">      preparedStatement.setString(6, param.getEmail());</span>
+<span class="fc" id="L147">      preparedStatement.setString(7, param.getNumeroDiTelefono());</span>
+
+<span class="fc" id="L149">      preparedStatement.executeUpdate();</span>
+    } finally {
+      try {
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">        if (preparedStatement != null) {</span>
+<span class="fc" id="L153">          preparedStatement.close();</span>
+        }
+      } finally {
+<span class="fc" id="L156">        DriverManagerConnectionPool.releaseConnection(connection);</span>
+      }
+    }
+<span class="fc" id="L159">  }</span>
+
+  /**
+   * Aggiornamento di un utente presente nel DB.
+   *
+   * @param param Utente da aggiornare
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public void doUpdate(UtenteBean param) throws SQLException {
+<span class="fc" id="L169">    Connection connection = null;</span>
+<span class="fc" id="L170">    PreparedStatement preparedStatement = null;</span>
+
+<span class="fc" id="L172">    String deleteSql =</span>
+        &quot;UPDATE &quot;
+            + nomeTabella
+            + &quot; SET password = ?, nome = ?, cognome = ?,&quot;
+            + &quot; dataDiNascita = ?, indirizzoEmail = ?, numeroDiTelefono = ?&quot;
+            + &quot; WHERE codiceFiscale = ?&quot;;
+
+    try {
+<span class="fc" id="L180">      connection = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L181">      preparedStatement = connection.prepareStatement(deleteSql);</span>
+<span class="fc" id="L182">      preparedStatement.setString(1, param.getPassword());</span>
+<span class="fc" id="L183">      preparedStatement.setString(2, param.getNome());</span>
+<span class="fc" id="L184">      preparedStatement.setString(3, param.getCognome());</span>
+<span class="fc" id="L185">      preparedStatement.setDate(4, param.getDataDiNascita());</span>
+<span class="fc" id="L186">      preparedStatement.setString(5, param.getEmail());</span>
+<span class="fc" id="L187">      preparedStatement.setString(6, param.getNumeroDiTelefono());</span>
+<span class="fc" id="L188">      preparedStatement.setString(7, param.getCodiceFiscale());</span>
+
+<span class="fc" id="L190">      preparedStatement.executeUpdate();</span>
+
+    } finally {
+      try {
+<span class="pc bpc" id="L194" title="1 of 2 branches missed.">        if (preparedStatement != null) {</span>
+<span class="fc" id="L195">          preparedStatement.close();</span>
+        }
+      } finally {
+<span class="fc" id="L198">        DriverManagerConnectionPool.releaseConnection(connection);</span>
+      }
+    }
+<span class="fc" id="L201">    return;</span>
+  }
+
+  /**
+   * Rimozione di un utente presente nel DB.
+   *
+   * @param param Utente da rimuovere
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public void doDelete(UtenteBean param) throws SQLException {
+<span class="fc" id="L212">    Connection connection = null;</span>
+<span class="fc" id="L213">    PreparedStatement preparedStatement = null;</span>
+
+<span class="fc" id="L215">    String deleteSql = &quot;DELETE FROM &quot; + nomeTabella + &quot; WHERE codiceFiscale = ?&quot;;</span>
+
+    try {
+<span class="fc" id="L218">      connection = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L219">      preparedStatement = connection.prepareStatement(deleteSql);</span>
+<span class="fc" id="L220">      preparedStatement.setString(1, param.getCodiceFiscale());</span>
+
+<span class="fc" id="L222">      preparedStatement.executeUpdate();</span>
+
+    } finally {
+      try {
+<span class="pc bpc" id="L226" title="1 of 2 branches missed.">        if (preparedStatement != null) {</span>
+<span class="fc" id="L227">          preparedStatement.close();</span>
+        }
+      } finally {
+<span class="fc" id="L230">        DriverManagerConnectionPool.releaseConnection(connection);</span>
+      }
+    }
+<span class="fc" id="L233">    return;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PrenotazioneDaoTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.model.interfaces</a> &gt; <span class="el_source">PrenotazioneDaoTest.java</span></div><h1>PrenotazioneDaoTest.java</h1><pre class="source lang-java linenums">package classes.model.interfaces;
+
+import classes.controller.exception.ObjectNotFoundException;
+import classes.model.bean.entity.PrenotazioneBean;
+import classes.model.dao.PrenotazioneModel;
+import org.junit.jupiter.api.Test;
+
+import java.sql.Date;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="fc" id="L16">class PrenotazioneDaoTest {</span>
+<span class="fc" id="L17">    private PrenotazioneModel prenotazioneModel = new PrenotazioneModel();</span>
+<span class="fc" id="L18">    private PrenotazioneBean prenotazioneBean = new PrenotazioneBean();</span>
+
+    @Test
+    void doRetrieveByKey() throws SQLException, ObjectNotFoundException {
+<span class="fc" id="L22">        assertNotNull(prenotazioneModel.doRetrieveByKey(1));</span>
+<span class="fc" id="L23">        assertNull(prenotazioneModel.doRetrieveByKey(48389572));</span>
+<span class="fc" id="L24">    }</span>
+
+    @Test
+    void doRetrieveAll() throws SQLException {
+<span class="fc" id="L28">        assertNotNull(prenotazioneModel.doRetrieveAll(&quot;&quot;));</span>
+<span class="fc" id="L29">    }</span>
+
+    @Test
+    void doSave() throws SQLException {
+<span class="fc" id="L33">        DateFormat df = new SimpleDateFormat(&quot;MM-dd-yyyy&quot;);</span>
+<span class="fc" id="L34">        Date date = null;</span>
+        try {
+<span class="fc" id="L36">            date = new Date(df.parse(&quot;02-04-2022&quot;).getTime());</span>
+<span class="nc" id="L37">        } catch (ParseException e) {</span>
+<span class="nc" id="L38">            e.printStackTrace();</span>
+<span class="fc" id="L39">        }</span>
+<span class="fc" id="L40">        prenotazioneBean.setDataPrenotazione(date);</span>
+<span class="fc" id="L41">        prenotazioneBean.setOra(&quot;11:00:00&quot;);</span>
+<span class="fc" id="L42">        prenotazioneBean.setCodiceFiscale(&quot;MNDCMN97R22A509S&quot;);</span>
+<span class="fc" id="L43">        prenotazioneBean.setConvalida(false);</span>
+<span class="fc" id="L44">        prenotazioneBean.setIdStruttura(1);</span>
+<span class="fc" id="L45">        prenotazioneBean.setIdOperazione(1);</span>
+<span class="fc" id="L46">        prenotazioneModel.doSave(prenotazioneBean);</span>
+<span class="fc" id="L47">    }</span>
+
+    @Test
+    void doUpdate() throws SQLException {
+<span class="fc" id="L51">        prenotazioneBean = prenotazioneModel.doRetrieveByKey(2);</span>
+<span class="fc" id="L52">        prenotazioneBean.setIdStruttura(2);</span>
+<span class="fc" id="L53">        prenotazioneModel.doUpdate(prenotazioneBean);</span>
+<span class="fc" id="L54">    }</span>
+
+    @Test
+    void doDelete() throws SQLException {
+<span class="fc" id="L58">        prenotazioneBean = prenotazioneModel.doRetrieveByKey(8);</span>
+<span class="fc" id="L59">        prenotazioneModel.doDelete(prenotazioneBean);</span>
+<span class="fc" id="L60">    }</span>
+
+    @Test
+    void getUtentePrenotazioni() throws SQLException {
+<span class="fc" id="L64">        assertNotNull(prenotazioneModel.getUtentePrenotazioni(&quot;CCCNTN98H02F839V&quot;));</span>
+<span class="fc" id="L65">        assertNull(prenotazioneModel.getUtentePrenotazioni(&quot;CCCNTN98H02F839Z&quot;));</span>
+<span class="fc" id="L66">    }</span>
+
+    @Test
+    void getCodaStruttura() throws SQLException {
+<span class="fc" id="L70">        assertNotNull(prenotazioneModel.getCodaStruttura(1));</span>
+<span class="fc" id="L71">    }</span>
+
+    @Test
+    void getOrariPrenotazione() throws SQLException {
+<span class="fc" id="L75">        DateFormat df = new SimpleDateFormat(&quot;MM-dd-yyyy&quot;);</span>
+<span class="fc" id="L76">        Date date = null;</span>
+        try {
+<span class="fc" id="L78">            date = new Date(df.parse(&quot;01-22-2021&quot;).getTime());</span>
+<span class="nc" id="L79">        } catch (ParseException e) {</span>
+<span class="nc" id="L80">            e.printStackTrace();</span>
+<span class="fc" id="L81">        }</span>
+<span class="fc" id="L82">        assertNotNull(prenotazioneModel.getOrariPrenotazione(1, 2, date));</span>
+
+<span class="fc" id="L84">        date = null;</span>
+        try {
+<span class="fc" id="L86">            date = new Date(df.parse(&quot;01-22-2021&quot;).getTime());</span>
+<span class="nc" id="L87">        } catch (ParseException e) {</span>
+<span class="nc" id="L88">            e.printStackTrace();</span>
+<span class="fc" id="L89">        }</span>
+<span class="fc" id="L90">        assertNotNull(prenotazioneModel.getOrariPrenotazione(5, 2, date));</span>
+<span class="fc" id="L91">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

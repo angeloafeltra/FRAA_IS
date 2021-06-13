@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PrenotazioneModel.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.model.dao</a> &gt; <span class="el_source">PrenotazioneModel.java</span></div><h1>PrenotazioneModel.java</h1><pre class="source lang-java linenums">package classes.model.dao;
+
+import classes.model.DriverManagerConnectionPool;
+import classes.model.bean.entity.PrenotazioneBean;
+import classes.model.interfaces.PrenotazioneDaoInterface;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * Model per collegare la tabella &quot;Prenotazione&quot; al backend.
+ */
+<span class="fc" id="L18">public class PrenotazioneModel implements PrenotazioneDaoInterface {</span>
+  private static final String nomeTabella = &quot;prenotazione&quot;;
+<span class="fc" id="L20">  private String[] elencoOrari = {&quot;09:00:00&quot;, &quot;09:15:00&quot;, &quot;09:30:00&quot;, &quot;09:45:00&quot;,</span>
+                                  &quot;10:00:00&quot;, &quot;10:15:00&quot;, &quot;10:30:00&quot;, &quot;10:45:00&quot;,
+                                  &quot;11:00:00&quot;, &quot;11:15:00&quot;, &quot;11:30:00&quot;, &quot;11:45:00&quot;,
+                                  &quot;12:00:00&quot;, &quot;12:15:00&quot;, &quot;12:30:00&quot;, &quot;12:45:00&quot;,
+                                  &quot;13:00:00&quot;};
+
+
+  /**
+   * Prelevamento singola prenotazione.
+   *
+   * @param id chiave primaria della prenotazione
+   * @return Prenotazione avente quell'id
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public PrenotazioneBean doRetrieveByKey(int id) throws SQLException {
+<span class="fc" id="L36">    Connection con = null;</span>
+<span class="fc" id="L37">    PreparedStatement ps = null;</span>
+
+<span class="fc" id="L39">    PrenotazioneBean tmp = new PrenotazioneBean();</span>
+
+<span class="fc" id="L41">    String selectSql = &quot;SELECT * FROM &quot; + nomeTabella + &quot; WHERE id = ?&quot;;</span>
+
+    try {
+<span class="fc" id="L44">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L45">      ps = con.prepareStatement(selectSql);</span>
+<span class="fc" id="L46">      ps.setInt(1, id);</span>
+
+<span class="fc" id="L48">      ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc bfc" id="L50" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L51">        tmp.setId(rs.getInt(&quot;id&quot;));</span>
+<span class="fc" id="L52">        tmp.setOra(rs.getString(&quot;ora&quot;));</span>
+<span class="fc" id="L53">        tmp.setDataPrenotazione(rs.getDate(&quot;data&quot;));</span>
+<span class="fc" id="L54">        tmp.setCodiceFiscale(rs.getString(&quot;codiceFiscale&quot;));</span>
+<span class="fc" id="L55">        tmp.setConvalida(rs.getBoolean(&quot;convalida&quot;));</span>
+<span class="fc" id="L56">        tmp.setIdStruttura(rs.getInt(&quot;idStruttura&quot;));</span>
+<span class="fc" id="L57">        tmp.setIdOperazione(rs.getInt(&quot;idOperazione&quot;));</span>
+      }
+<span class="nc" id="L59">    } catch (SQLException e) {</span>
+<span class="nc" id="L60">      e.printStackTrace();</span>
+    } finally {
+      try {
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        if (ps != null) {</span>
+<span class="fc" id="L64">          ps.close();</span>
+        }
+      } finally {
+<span class="fc" id="L67">        DriverManagerConnectionPool.releaseConnection(con);</span>
+      }
+    }
+
+<span class="fc bfc" id="L71" title="All 2 branches covered.">    if (tmp.getCodiceFiscale() != null) {</span>
+<span class="fc" id="L72">      return tmp;</span>
+    } else {
+<span class="fc" id="L74">      return null;</span>
+    }
+  }
+
+  /**
+   * Prelevamento di tutte le prenotazione.
+   *
+   * @param order Ordine per la visualizzazione della collezione
+   * @return Collezione di tutte le prenotazioni
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public Collection&lt;PrenotazioneBean&gt; doRetrieveAll(String order) throws SQLException {
+<span class="fc" id="L87">    Connection con = null;</span>
+<span class="fc" id="L88">    PreparedStatement ps = null;</span>
+
+<span class="fc" id="L90">    Collection&lt;PrenotazioneBean&gt; result = new LinkedList&lt;PrenotazioneBean&gt;();</span>
+
+<span class="fc" id="L92">    String selectSql = &quot;SELECT * FROM &quot; + nomeTabella;</span>
+
+<span class="pc bpc" id="L94" title="1 of 4 branches missed.">    if (order != null &amp;&amp; !order.equals(&quot;&quot;)) {</span>
+<span class="fc" id="L95">      selectSql += &quot; ORDER BY &quot; + order;</span>
+    }
+
+    try {
+
+<span class="fc" id="L100">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L101">      ps = con.prepareStatement(selectSql);</span>
+
+<span class="fc" id="L103">      ResultSet rs = ps.executeQuery();</span>
+
+
+<span class="fc bfc" id="L106" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L107">        PrenotazioneBean tmp = new PrenotazioneBean();</span>
+<span class="fc" id="L108">        tmp.setId(rs.getInt(&quot;id&quot;));</span>
+<span class="fc" id="L109">        tmp.setOra(rs.getString(&quot;ora&quot;));</span>
+<span class="fc" id="L110">        tmp.setDataPrenotazione(rs.getDate(&quot;data&quot;));</span>
+<span class="fc" id="L111">        tmp.setCodiceFiscale(rs.getString(&quot;codiceFiscale&quot;));</span>
+<span class="fc" id="L112">        tmp.setConvalida(rs.getBoolean(&quot;convalida&quot;));</span>
+<span class="fc" id="L113">        tmp.setIdStruttura(rs.getInt(&quot;idStruttura&quot;));</span>
+<span class="fc" id="L114">        tmp.setIdOperazione(rs.getInt(&quot;idOperazione&quot;));</span>
+<span class="fc" id="L115">        result.add(tmp);</span>
+<span class="fc" id="L116">      }</span>
+
+<span class="nc" id="L118">    } catch (SQLException e) {</span>
+<span class="nc" id="L119">      e.printStackTrace();</span>
+    } finally {
+      try {
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">        if (ps != null) {</span>
+<span class="fc" id="L123">          ps.close();</span>
+        }
+      } finally {
+<span class="fc" id="L126">        DriverManagerConnectionPool.releaseConnection(con);</span>
+      }
+    }
+
+<span class="fc" id="L130">    return result;</span>
+  }
+
+  /**
+   * Inserimento di una nuova prenotazione nel DB.
+   *
+   * @param param Nuova prenotazione
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public void doSave(PrenotazioneBean param) throws SQLException {
+<span class="fc" id="L141">    Connection connection = null;</span>
+<span class="fc" id="L142">    PreparedStatement preparedStatement = null;</span>
+
+<span class="fc" id="L144">    String insertSql = &quot;INSERT INTO &quot; + nomeTabella</span>
+            + &quot;(data, ora, convalida, codiceFiscale, idOperazione, idStruttura) &quot;
+            + &quot; VALUES (?, ?, ?, ?, ?, ?)&quot;;
+
+    try {
+<span class="fc" id="L149">      connection = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L150">      preparedStatement = connection.prepareStatement(insertSql);</span>
+<span class="fc" id="L151">      preparedStatement.setDate(1, param.getDataPrenotazione());</span>
+<span class="fc" id="L152">      preparedStatement.setString(2, param.getOra());</span>
+<span class="fc" id="L153">      preparedStatement.setBoolean(3, param.isConvalida());</span>
+<span class="fc" id="L154">      preparedStatement.setString(4, param.getCodiceFiscale());</span>
+<span class="fc" id="L155">      preparedStatement.setInt(5, param.getIdOperazione());</span>
+<span class="fc" id="L156">      preparedStatement.setInt(6, param.getIdStruttura());</span>
+
+<span class="fc" id="L158">      preparedStatement.executeUpdate();</span>
+    } finally {
+      try {
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">        if (preparedStatement != null) {</span>
+<span class="fc" id="L162">          preparedStatement.close();</span>
+        }
+      } finally {
+<span class="fc" id="L165">        DriverManagerConnectionPool.releaseConnection(connection);</span>
+      }
+    }
+<span class="fc" id="L168">  }</span>
+
+  /**
+   * Aggiornamento di una prenotazione presente nel DB.
+   *
+   * @param param Prenotazione da aggiornare
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public void doUpdate(PrenotazioneBean param) throws SQLException {
+<span class="fc" id="L178">    Connection connection = null;</span>
+<span class="fc" id="L179">    PreparedStatement preparedStatement = null;</span>
+
+<span class="fc" id="L181">    String updateSql =</span>
+        &quot;UPDATE &quot;
+            + nomeTabella
+            + &quot; SET ora = ?, data = ?, codiceFiscale = ?,&quot;
+            + &quot; idOperazione = ?, idStruttura = ?, convalida = ? WHERE id = ?&quot;;
+
+    try {
+<span class="fc" id="L188">      connection = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L189">      preparedStatement = connection.prepareStatement(updateSql);</span>
+<span class="fc" id="L190">      preparedStatement.setString(1, param.getOra());</span>
+<span class="fc" id="L191">      preparedStatement.setDate(2, param.getDataPrenotazione());</span>
+<span class="fc" id="L192">      preparedStatement.setString(3, param.getCodiceFiscale());</span>
+<span class="fc" id="L193">      preparedStatement.setInt(4, param.getIdOperazione());</span>
+<span class="fc" id="L194">      preparedStatement.setInt(5, param.getIdStruttura());</span>
+<span class="fc" id="L195">      preparedStatement.setBoolean(6, param.isConvalida());</span>
+<span class="fc" id="L196">      preparedStatement.setInt(7, param.getId());</span>
+
+<span class="fc" id="L198">      preparedStatement.executeUpdate();</span>
+
+    } finally {
+      try {
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">        if (preparedStatement != null) {</span>
+<span class="fc" id="L203">          preparedStatement.close();</span>
+        }
+      } finally {
+<span class="fc" id="L206">        DriverManagerConnectionPool.releaseConnection(connection);</span>
+      }
+    }
+<span class="fc" id="L209">    return;</span>
+  }
+
+  /**
+   * Rimozione di una prenotazione presente sul DB.
+   *
+   * @param param Prenotazione da rimuovere
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public void doDelete(PrenotazioneBean param) throws SQLException {
+<span class="fc" id="L220">    Connection connection = null;</span>
+<span class="fc" id="L221">    PreparedStatement preparedStatement = null;</span>
+
+<span class="fc" id="L223">    String deleteSql = &quot;DELETE FROM &quot; + nomeTabella + &quot; WHERE id = ?&quot;;</span>
+
+    try {
+<span class="fc" id="L226">      connection = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L227">      preparedStatement = connection.prepareStatement(deleteSql);</span>
+<span class="fc" id="L228">      preparedStatement.setInt(1, param.getId());</span>
+
+<span class="fc" id="L230">      preparedStatement.executeUpdate();</span>
+
+    } finally {
+      try {
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">        if (preparedStatement != null) {</span>
+<span class="fc" id="L235">          preparedStatement.close();</span>
+        }
+      } finally {
+<span class="fc" id="L238">        DriverManagerConnectionPool.releaseConnection(connection);</span>
+      }
+    }
+<span class="fc" id="L241">    return;</span>
+  }
+
+  /**
+   * Metodo per prelevare tutte le prenotazioni di un utente.
+   *
+   * @param cf chiave primaria dell'utente di cui vogliamo prendere le prenotazioni
+   * @return Collezione di prenotazioni dell'utente avente quel codice fiscale
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public Collection&lt;PrenotazioneBean&gt; getUtentePrenotazioni(String cf) throws SQLException {
+<span class="fc" id="L253">    Connection con = null;</span>
+<span class="fc" id="L254">    PreparedStatement ps = null;</span>
+
+<span class="fc" id="L256">    Collection&lt;PrenotazioneBean&gt; result = new LinkedList&lt;PrenotazioneBean&gt;();</span>
+
+
+<span class="fc" id="L259">    String selectSql = &quot;SELECT * FROM &quot; + nomeTabella + &quot; WHERE codiceFiscale = ? ORDER BY data&quot;;</span>
+
+    try {
+<span class="fc" id="L262">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L263">      ps = con.prepareStatement(selectSql);</span>
+<span class="fc" id="L264">      ps.setString(1, cf);</span>
+
+<span class="fc" id="L266">      ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc bfc" id="L268" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L269">        PrenotazioneBean tmp = new PrenotazioneBean();</span>
+<span class="fc" id="L270">        tmp.setId(rs.getInt(&quot;id&quot;));</span>
+<span class="fc" id="L271">        tmp.setOra(rs.getString(&quot;ora&quot;));</span>
+<span class="fc" id="L272">        tmp.setDataPrenotazione(rs.getDate(&quot;data&quot;));</span>
+<span class="fc" id="L273">        tmp.setCodiceFiscale(rs.getString(&quot;codiceFiscale&quot;));</span>
+<span class="fc" id="L274">        tmp.setConvalida(rs.getBoolean(&quot;convalida&quot;));</span>
+<span class="fc" id="L275">        tmp.setIdStruttura(rs.getInt(&quot;idStruttura&quot;));</span>
+<span class="fc" id="L276">        tmp.setIdOperazione(rs.getInt(&quot;idOperazione&quot;));</span>
+<span class="fc" id="L277">        result.add(tmp);</span>
+<span class="fc" id="L278">      }</span>
+<span class="nc" id="L279">    } catch (SQLException e) {</span>
+<span class="nc" id="L280">      e.printStackTrace();</span>
+    } finally {
+      try {
+<span class="pc bpc" id="L283" title="1 of 2 branches missed.">        if (ps != null) {</span>
+<span class="fc" id="L284">          ps.close();</span>
+        }
+      } finally {
+<span class="fc" id="L287">        DriverManagerConnectionPool.releaseConnection(con);</span>
+      }
+    }
+
+<span class="fc bfc" id="L291" title="All 2 branches covered.">    if (result.isEmpty()) {</span>
+<span class="fc" id="L292">      return null;</span>
+    }
+<span class="fc" id="L294">    return result;</span>
+  }
+
+  /**
+   * Metodo per prelevare tutte le prenotazioni di una struttura.
+   *
+   * @param idStruttura chiave primaria della struttura di cui vogliamo la coda
+   * @return Collezione che rappresenta la coda della struttura
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public Collection&lt;PrenotazioneBean&gt; getCodaStruttura(int idStruttura) throws SQLException {
+<span class="fc" id="L306">    Connection connection = null;</span>
+<span class="fc" id="L307">    PreparedStatement preparedStatement = null;</span>
+
+<span class="fc" id="L309">    Collection&lt;PrenotazioneBean&gt; result = new LinkedList&lt;PrenotazioneBean&gt;();</span>
+
+
+<span class="fc" id="L312">    String selectPrenotazioniSql = &quot;SELECT * FROM &quot; + nomeTabella</span>
+            + &quot; WHERE idStruttura = ? ORDER BY data AND ora&quot;;
+
+    try {
+<span class="fc" id="L316">      connection = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L317">      preparedStatement = connection.prepareStatement(selectPrenotazioniSql);</span>
+
+<span class="fc" id="L319">      preparedStatement.setInt(1, idStruttura);</span>
+<span class="fc" id="L320">      ResultSet rs = preparedStatement.executeQuery();</span>
+
+<span class="fc bfc" id="L322" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L323">        PrenotazioneBean tmp = new PrenotazioneBean();</span>
+<span class="fc" id="L324">        tmp.setId(rs.getInt(&quot;id&quot;));</span>
+<span class="fc" id="L325">        tmp.setOra(rs.getString(&quot;ora&quot;));</span>
+<span class="fc" id="L326">        tmp.setDataPrenotazione(rs.getDate(&quot;data&quot;));</span>
+<span class="fc" id="L327">        tmp.setCodiceFiscale(rs.getString(&quot;codiceFiscale&quot;));</span>
+<span class="fc" id="L328">        tmp.setConvalida(rs.getBoolean(&quot;convalida&quot;));</span>
+<span class="fc" id="L329">        tmp.setIdStruttura(rs.getInt(&quot;idStruttura&quot;));</span>
+<span class="fc" id="L330">        tmp.setIdOperazione(rs.getInt(&quot;idOperazione&quot;));</span>
+<span class="fc" id="L331">        result.add(tmp);</span>
+<span class="fc" id="L332">      }</span>
+<span class="nc" id="L333">    } catch (SQLException e) {</span>
+<span class="nc" id="L334">      e.printStackTrace();</span>
+    } finally {
+      try {
+<span class="pc bpc" id="L337" title="1 of 2 branches missed.">        if (preparedStatement != null) {</span>
+<span class="fc" id="L338">          preparedStatement.close();</span>
+        }
+      } finally {
+<span class="fc" id="L341">        DriverManagerConnectionPool.releaseConnection(connection);</span>
+      }
+    }
+
+<span class="fc" id="L345">    return result;</span>
+  }
+
+  /**
+   * Metodo per prelevare gli orari di prenotazione liberi.
+   *
+   * @param idStruttura id della Struttura selezionata
+   * @param idOperazione id dell'operazione selezionata
+   * @param dataPrenotazione data della prenotazione
+   * @return Collezione di orari
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public List&lt;String&gt; getOrariPrenotazione(int idStruttura, int idOperazione,
+                                           java.sql.Date dataPrenotazione)throws SQLException {
+
+<span class="fc" id="L361">    Connection connection = null;</span>
+<span class="fc" id="L362">    PreparedStatement preparedStatement = null;</span>
+
+<span class="fc" id="L364">    List&lt;String&gt; query = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L365">    List&lt;String&gt; result = new ArrayList&lt;String&gt;();</span>
+
+
+<span class="fc" id="L368">    String selecrOrariSql = &quot;SELECT ora FROM &quot; + nomeTabella</span>
+            + &quot; WHERE idStruttura =? AND idOperazione=? AND data=? ORDER BY ora&quot;;
+
+    try {
+<span class="fc" id="L372">      connection = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L373">      preparedStatement = connection.prepareStatement(selecrOrariSql);</span>
+
+<span class="fc" id="L375">      preparedStatement.setInt(1, idStruttura);</span>
+<span class="fc" id="L376">      preparedStatement.setInt(2, idOperazione);</span>
+<span class="fc" id="L377">      preparedStatement.setDate(3, dataPrenotazione);</span>
+<span class="fc" id="L378">      ResultSet res = preparedStatement.executeQuery();</span>
+
+<span class="fc bfc" id="L380" title="All 2 branches covered.">      while (res.next()) {</span>
+<span class="fc" id="L381">        query.add(res.getString(&quot;ora&quot;));</span>
+      }
+
+      //Esempio per testare giorno completamente pieno
+      /*query.clear();
+      for(int i = 0;  i &lt; elencoOrari.length; i++) {
+        query.add(elencoOrari[i]);
+      }*/
+
+<span class="fc bfc" id="L390" title="All 2 branches covered.">      if (query.size() &gt; 0) {</span>
+<span class="fc bfc" id="L391" title="All 2 branches covered.">        for (int i = 0, j = 0; i &lt; elencoOrari.length; i++) {</span>
+<span class="fc bfc" id="L392" title="All 2 branches covered.">          if (!elencoOrari[i].equals(query.get(j))) {</span>
+<span class="fc" id="L393">            result.add(elencoOrari[i]);</span>
+          } else {
+<span class="fc bfc" id="L395" title="All 2 branches covered.">            if (j &lt; query.size() - 1) {</span>
+<span class="fc" id="L396">              j++;</span>
+            } else {
+<span class="fc" id="L398">              j = query.size() - 1;</span>
+            }
+          }
+        }
+      } else {
+        //Se sono liberi tutti gli orari
+<span class="fc bfc" id="L404" title="All 2 branches covered.">        for (int i = 0;  i &lt; elencoOrari.length; i++) {</span>
+<span class="fc" id="L405">          result.add(elencoOrari[i]);</span>
+        }
+      }
+
+      //Se sono occupati tutti gli orari
+<span class="pc bpc" id="L410" title="1 of 2 branches missed.">      if (result.size() == 0) {</span>
+<span class="nc" id="L411">        System.exit(400);</span>
+      }
+<span class="nc" id="L413">    } catch (SQLException e) {</span>
+<span class="nc" id="L414">      e.printStackTrace();</span>
+    } finally {
+      try {
+<span class="pc bpc" id="L417" title="1 of 2 branches missed.">        if (preparedStatement != null) {</span>
+<span class="fc" id="L418">          preparedStatement.close();</span>
+        }
+      } finally {
+<span class="fc" id="L421">        DriverManagerConnectionPool.releaseConnection(connection);</span>
+      }
+    }
+<span class="fc" id="L424">    return result;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AmbulatorioController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.controller</a> &gt; <span class="el_source">AmbulatorioController.java</span></div><h1>AmbulatorioController.java</h1><pre class="source lang-java linenums">package classes.controller;
+
+import classes.controller.exception.ErrorNewObjectException;
+import classes.controller.exception.InvalidKeyException;
+import classes.controller.exception.ObjectNotFoundException;
+import classes.model.bean.entity.AmbulatoriBean;
+import classes.model.bean.entity.StrutturaBean;
+import classes.model.dao.AmbulatoriModel;
+import classes.model.dao.StrutturaModel;
+import classes.model.interfaces.AmbulatorioDaoInterface;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.sql.SQLException;
+import java.util.Collection;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+
+/** Classe per controllare i metodi del Model di Ambulatori. */
+@RestController
+<span class="fc" id="L23">public class AmbulatorioController {</span>
+
+<span class="fc" id="L25">  private final AmbulatorioDaoInterface ambulatorioModel = new AmbulatoriModel();</span>
+<span class="fc" id="L26">  private final StrutturaModel strutturaModel = new StrutturaModel();</span>
+
+  /**
+   * Metodo che permette di utilizzare il prelevamento per id dell'AmbulatoriModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return Ambulatorio avente l'id passato
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ObjectNotFoundException problemi di oggetto non trovato
+   * @throws InvalidKeyException per problemi con la chiave primaria
+   */
+  @PostMapping(
+      value = &quot;/ambulatorio/{id}&quot;,
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
+  public AmbulatoriBean getById(@RequestBody String body)
+      throws SQLException, ObjectNotFoundException, InvalidKeyException {
+<span class="fc" id="L43">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L44">    int id = jsonObject.get(&quot;id&quot;).getAsInt();</span>
+
+<span class="fc bfc" id="L46" title="All 2 branches covered.">    if (id &gt; 0) {</span>
+<span class="fc" id="L47">      AmbulatoriBean ambulatoriBean = ambulatorioModel.doRetrieveByKey(id);</span>
+
+<span class="fc bfc" id="L49" title="All 2 branches covered.">      if (ambulatoriBean != null) {</span>
+<span class="fc" id="L50">        return ambulatoriBean;</span>
+      } else {
+<span class="fc" id="L52">        throw new ObjectNotFoundException(new AmbulatoriBean());</span>
+      }
+    } else {
+<span class="fc" id="L55">      throw new InvalidKeyException(&quot;Id invalido, occorre un id maggiore di 0&quot;);</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di utilizzare il prelevamento di tutti gli oggetti dell'AmbulatoriModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return Collezione di Ambulatori
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @PostMapping(value = &quot;/ambulatori&quot;, produces = MediaType.APPLICATION_JSON_VALUE)
+  public Collection&lt;AmbulatoriBean&gt; getAllAmbulatori(@RequestBody String body)
+          throws SQLException {
+<span class="fc" id="L69">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L70">    String order = jsonObject.get(&quot;ordineAmbulatori&quot;).getAsString();</span>
+<span class="fc" id="L71">    return ambulatorioModel.doRetrieveAll(order);</span>
+  }
+
+  /**
+   * Metodo che permette di utilizzare l'inserimento di un nuovo ambulatorio tramite
+   * AmbulatorioModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ErrorNewObjectException per problemi nell'input
+   * @return conferma/non conferma del salvataggio dell'ambulatorio
+   */
+  @PostMapping(value = &quot;/newAmbulatorio&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public boolean newAmbulatorio(@RequestBody String body) throws SQLException,
+          ErrorNewObjectException {
+<span class="fc" id="L87">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L88">    String idStruttura = jsonObject.get(&quot;newAmbulatorioIdS&quot;).getAsString();</span>
+<span class="fc" id="L89">    String nome = jsonObject.get(&quot;newAmbulatorioNome&quot;).getAsString();</span>
+
+<span class="fc" id="L91">    StrutturaBean strutturaBean = strutturaModel.doRetrieveByKey(Integer.valueOf(idStruttura));</span>
+
+<span class="fc" id="L93">    boolean checkNome = nome.matches(&quot;^[a-z A-Z ,.'-]+$&quot;);</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">    boolean checkIdStruttura = strutturaBean != null;</span>
+
+<span class="pc bpc" id="L96" title="1 of 4 branches missed.">    if (checkNome &amp;&amp; checkIdStruttura) {</span>
+<span class="fc" id="L97">      ambulatorioModel.doSave(new</span>
+<span class="fc" id="L98">              AmbulatoriBean(nome, Integer.valueOf(idStruttura)));</span>
+<span class="fc" id="L99">      return true;</span>
+    } else {
+<span class="fc" id="L101">      throw new ErrorNewObjectException(new AmbulatoriBean());</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di utilizzare l'eliminazione di un ambulatorio presente sul DB tramite
+   * AmbulatorioModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @PostMapping(value = &quot;/deleteAmbulatorio&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public void deleteAmbulatorio(@RequestBody String body) throws SQLException {
+<span class="fc" id="L115">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L116">    String id = jsonObject.get(&quot;idAmbulatorioRemove&quot;).getAsString();</span>
+<span class="fc" id="L117">    ambulatorioModel.doDelete(ambulatorioModel.doRetrieveByKey(Integer.valueOf(id)));</span>
+<span class="fc" id="L118">  }</span>
+
+  /**
+   * Metodo che permette di utilizzare l'aggiornamento di un ambulatorio presente sul DB tramite
+   * AmbulatorioModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   * @return conferma/non conferma dell'aggiornamento dell'ambulatorio
+   */
+  @PostMapping(value = &quot;/updateAmbulatorio&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public boolean updateAmbulatorio(@RequestBody String body) throws SQLException {
+<span class="fc" id="L131">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L132">    String id = jsonObject.get(&quot;idAmbulatorioUpdate&quot;).getAsString();</span>
+<span class="fc" id="L133">    String nome = jsonObject.get(&quot;AmbulatoriUpdateName&quot;).getAsString();</span>
+<span class="fc" id="L134">    String idStruttura = jsonObject.get(&quot;AmbulatoriUpdateIdStruttura&quot;).getAsString();</span>
+<span class="fc" id="L135">    AmbulatoriBean a = ambulatorioModel.doRetrieveByKey(Integer.valueOf(id));</span>
+
+
+<span class="fc bfc" id="L138" title="All 2 branches covered.">    if (a != null) {</span>
+      StrutturaBean strutturaBean;
+<span class="fc" id="L140">      strutturaBean = strutturaModel.doRetrieveByKey(Integer.valueOf(idStruttura));</span>
+
+<span class="fc" id="L142">      Boolean checkNome = nome.matches(&quot;^[a-z A-Z 0-9 ,.'-]+$&quot;);</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">      Boolean checkIdStruttura = strutturaBean != null;</span>
+
+<span class="pc bpc" id="L145" title="1 of 4 branches missed.">      if (checkNome &amp;&amp; checkIdStruttura) {</span>
+<span class="fc" id="L146">        a.setNome(nome);</span>
+<span class="fc" id="L147">        a.setIdStruttura(Integer.valueOf(idStruttura));</span>
+<span class="fc" id="L148">        ambulatorioModel.doUpdate(a);</span>
+<span class="fc" id="L149">        return true;</span>
+      }
+<span class="fc" id="L151">      return false;</span>
+    } else {
+<span class="fc" id="L153">      throw new ObjectNotFoundException(new AmbulatoriBean());</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AmbulatoriModel.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.model.dao</a> &gt; <span class="el_source">AmbulatoriModel.java</span></div><h1>AmbulatoriModel.java</h1><pre class="source lang-java linenums">package classes.model.dao;
+
+import classes.model.DriverManagerConnectionPool;
+import classes.model.bean.entity.AmbulatoriBean;
+import classes.model.interfaces.AmbulatorioDaoInterface;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.LinkedList;
+
+/**
+ * Model per collegare la tabella &quot;Ambulatori&quot; al backend.
+ */
+<span class="fc" id="L16">public class AmbulatoriModel implements AmbulatorioDaoInterface {</span>
+
+  private static final String nomeTabella = &quot;ambulatorio&quot;;
+
+  /**
+   * Prelevamento singolo ambulatorio.
+   *
+   * @param id chiave primaria dell'ambulatorio
+   * @return Ambulatorio avente quell'id
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public AmbulatoriBean doRetrieveByKey(int id) throws SQLException {
+<span class="fc" id="L29">    Connection con = null;</span>
+<span class="fc" id="L30">    PreparedStatement ps = null;</span>
+
+<span class="fc" id="L32">    AmbulatoriBean tmp = new AmbulatoriBean();</span>
+
+<span class="fc" id="L34">    String selectSql = &quot;SELECT * FROM &quot; + nomeTabella + &quot; WHERE id = ?&quot;;</span>
+
+    try {
+<span class="fc" id="L37">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L38">      ps = con.prepareStatement(selectSql);</span>
+<span class="fc" id="L39">      ps.setInt(1, id);</span>
+
+<span class="fc" id="L41">      ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc bfc" id="L43" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L44">        tmp.setId(rs.getInt(&quot;Id&quot;));</span>
+<span class="fc" id="L45">        tmp.setNome(rs.getString(&quot;Nome&quot;));</span>
+<span class="fc" id="L46">        tmp.setIdStruttura(rs.getInt(&quot;idStruttura&quot;));</span>
+      }
+<span class="nc" id="L48">    } catch (SQLException e) {</span>
+<span class="nc" id="L49">      e.printStackTrace();</span>
+    } finally {
+      try {
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        if (ps != null) {</span>
+<span class="fc" id="L53">          ps.close();</span>
+        }
+      } finally {
+<span class="fc" id="L56">        DriverManagerConnectionPool.releaseConnection(con);</span>
+      }
+    }
+
+<span class="fc bfc" id="L60" title="All 2 branches covered.">    if (tmp.getNome() != null) {</span>
+<span class="fc" id="L61">      return tmp;</span>
+    } else {
+<span class="fc" id="L63">      return null;</span>
+    }
+  }
+
+  /**
+   * Prelevamento di tutti gli ambulatori presenti nel DB.
+   *
+   * @param order Ordine per la visualizzazione della collezione
+   * @return Collezione di ambulatori
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public Collection&lt;AmbulatoriBean&gt; doRetrieveAll(String order) throws SQLException {
+<span class="fc" id="L76">    Connection con = null;</span>
+<span class="fc" id="L77">    PreparedStatement ps = null;</span>
+
+<span class="fc" id="L79">    Collection&lt;AmbulatoriBean&gt; result = new LinkedList&lt;AmbulatoriBean&gt;();</span>
+
+<span class="fc" id="L81">    String selectSql = &quot;SELECT * FROM &quot; + nomeTabella;</span>
+
+<span class="pc bpc" id="L83" title="1 of 4 branches missed.">    if (order != null &amp;&amp; !order.equals(&quot;&quot;)) {</span>
+<span class="fc" id="L84">      selectSql += &quot; ORDER BY &quot; + order;</span>
+    }
+
+    try {
+
+<span class="fc" id="L89">      con = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L90">      ps = con.prepareStatement(selectSql);</span>
+<span class="fc" id="L91">      ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc bfc" id="L93" title="All 2 branches covered.">      while (rs.next()) {</span>
+<span class="fc" id="L94">        AmbulatoriBean tmp = new AmbulatoriBean();</span>
+<span class="fc" id="L95">        tmp.setId(rs.getInt(&quot;id&quot;));</span>
+<span class="fc" id="L96">        tmp.setNome(rs.getString(&quot;nome&quot;));</span>
+<span class="fc" id="L97">        tmp.setIdStruttura(rs.getInt(&quot;idStruttura&quot;));</span>
+<span class="fc" id="L98">        result.add(tmp);</span>
+<span class="fc" id="L99">      }</span>
+
+<span class="nc" id="L101">    } catch (SQLException e) {</span>
+<span class="nc" id="L102">      e.printStackTrace();</span>
+    } finally {
+      try {
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">        if (ps != null) {</span>
+<span class="fc" id="L106">          ps.close();</span>
+        }
+      } finally {
+<span class="fc" id="L109">        DriverManagerConnectionPool.releaseConnection(con);</span>
+      }
+    }
+
+<span class="fc" id="L113">    return result;</span>
+  }
+
+  /**
+   * Insierimento di un nuovo ambulatorio nel DB.
+   *
+   * @param param Nuovo ambulatorio
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public void doSave(AmbulatoriBean param) throws SQLException {
+<span class="fc" id="L124">    Connection connection = null;</span>
+<span class="fc" id="L125">    PreparedStatement preparedStatement = null;</span>
+
+<span class="fc" id="L127">    String insertSql = &quot;INSERT INTO &quot; + nomeTabella + &quot; VALUES (?, ?, ?)&quot;;</span>
+
+    try {
+<span class="fc" id="L130">      connection = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L131">      preparedStatement = connection.prepareStatement(insertSql);</span>
+<span class="fc" id="L132">      preparedStatement.setInt(1, param.getId());</span>
+<span class="fc" id="L133">      preparedStatement.setString(2, param.getNome());</span>
+<span class="fc" id="L134">      preparedStatement.setInt(3, param.getIdStruttura());</span>
+
+<span class="fc" id="L136">      preparedStatement.executeUpdate();</span>
+    } finally {
+      try {
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">        if (preparedStatement != null) {</span>
+<span class="fc" id="L140">          preparedStatement.close();</span>
+        }
+      } finally {
+<span class="fc" id="L143">        DriverManagerConnectionPool.releaseConnection(connection);</span>
+      }
+    }
+<span class="fc" id="L146">  }</span>
+
+  /**
+   * Aggiornamento di un ambulatorio presente nel DB.
+   *
+   * @param param Ambulatorio da aggiornare
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public void doUpdate(AmbulatoriBean param) throws SQLException {
+<span class="fc" id="L156">    Connection connection = null;</span>
+<span class="fc" id="L157">    PreparedStatement preparedStatement = null;</span>
+
+<span class="fc" id="L159">    String deleteSql = &quot;UPDATE &quot; + nomeTabella + &quot; SET nome = ?, idStruttura = ? WHERE id = ?&quot;;</span>
+
+    try {
+<span class="fc" id="L162">      connection = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L163">      preparedStatement = connection.prepareStatement(deleteSql);</span>
+<span class="fc" id="L164">      preparedStatement.setString(1, param.getNome());</span>
+<span class="fc" id="L165">      preparedStatement.setInt(2, param.getIdStruttura());</span>
+<span class="fc" id="L166">      preparedStatement.setInt(3, param.getId());</span>
+
+<span class="fc" id="L168">      preparedStatement.executeUpdate();</span>
+
+    } finally {
+      try {
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">        if (preparedStatement != null) {</span>
+<span class="fc" id="L173">          preparedStatement.close();</span>
+        }
+      } finally {
+<span class="fc" id="L176">        DriverManagerConnectionPool.releaseConnection(connection);</span>
+      }
+    }
+<span class="fc" id="L179">    return;</span>
+  }
+
+  /**
+   * Rimozione di un ambulatorio presente nel DB.
+   *
+   * @param param Ambulatorio da rimuovere
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @Override
+  public void doDelete(AmbulatoriBean param) throws SQLException {
+<span class="fc" id="L190">    Connection connection = null;</span>
+<span class="fc" id="L191">    PreparedStatement preparedStatement = null;</span>
+
+<span class="fc" id="L193">    String deleteSql = &quot;DELETE FROM &quot; + nomeTabella + &quot; WHERE id = ?&quot;;</span>
+
+    try {
+<span class="fc" id="L196">      connection = DriverManagerConnectionPool.getConnection();</span>
+<span class="fc" id="L197">      preparedStatement = connection.prepareStatement(deleteSql);</span>
+<span class="fc" id="L198">      preparedStatement.setInt(1, param.getId());</span>
+
+<span class="fc" id="L200">      preparedStatement.executeUpdate();</span>
+
+    } finally {
+      try {
+<span class="pc bpc" id="L204" title="1 of 2 branches missed.">        if (preparedStatement != null) {</span>
+<span class="fc" id="L205">          preparedStatement.close();</span>
+        }
+      } finally {
+<span class="fc" id="L208">        DriverManagerConnectionPool.releaseConnection(connection);</span>
+      }
+    }
+<span class="fc" id="L211">    return;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

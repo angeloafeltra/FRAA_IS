@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OperazioneController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.controller</a> &gt; <span class="el_source">OperazioneController.java</span></div><h1>OperazioneController.java</h1><pre class="source lang-java linenums">package classes.controller;
+
+import classes.controller.exception.ErrorNewObjectException;
+import classes.controller.exception.InvalidKeyException;
+import classes.controller.exception.ObjectNotFoundException;
+import classes.model.bean.entity.OperazioneBean;
+import classes.model.dao.OperazioneModel;
+import classes.model.interfaces.OperazioneDaoInterface;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.sql.SQLException;
+import java.util.Collection;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+
+/** Classe per controllare i metodi del Model di Operazione. */
+@RestController
+<span class="fc" id="L21">public class OperazioneController {</span>
+
+<span class="fc" id="L23">  private final OperazioneDaoInterface operazioneModel = new OperazioneModel();</span>
+
+  /**
+   * Metodo che permette di utilizzare il prelevamento per id dell'OperazioneModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return Operazione avente l'id passato
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ObjectNotFoundException per problemi di oggetto non trovato
+   * @throws InvalidKeyException per problemi di chiave primaria
+   */
+  @PostMapping(value = &quot;/operazione/{id}&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public OperazioneBean getOperazioneById(@RequestBody String body)
+      throws SQLException, ObjectNotFoundException, InvalidKeyException {
+<span class="fc" id="L38">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L39">    String idString = jsonObject.get(&quot;idOperazioneGet&quot;).getAsString();</span>
+<span class="fc" id="L40">    int id = Integer.valueOf(idString);</span>
+
+<span class="fc bfc" id="L42" title="All 2 branches covered.">    if (id &gt; 0) {</span>
+<span class="fc" id="L43">      OperazioneBean operazioneBean = operazioneModel.doRetrieveByKey(id);</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">      if (operazioneBean != null) {</span>
+<span class="fc" id="L45">        return operazioneBean;</span>
+      } else {
+<span class="fc" id="L47">        throw new ObjectNotFoundException(new OperazioneBean());</span>
+      }
+    } else {
+<span class="fc" id="L50">      throw new InvalidKeyException(&quot;Id invalido, occorre un id maggiore di 0&quot;);</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di utilizzare il prelevamento per id dell'OperazioneModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return Operazione avente l'id passato
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ObjectNotFoundException per problemi di oggetto non trovato
+   */
+  @PostMapping(value = &quot;/operazione/{tipo}&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public OperazioneBean getOperazioneByTipo(@RequestBody String body) throws SQLException,
+          ObjectNotFoundException {
+<span class="fc" id="L66">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L67">    String tipo = jsonObject.get(&quot;tipoOperazioneGet&quot;).getAsString();</span>
+
+<span class="fc" id="L69">    OperazioneBean operazioneBean = operazioneModel.doRetrieveByTipo(tipo);</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">    if (operazioneBean != null) {</span>
+<span class="fc" id="L71">      return operazioneBean;</span>
+    } else {
+<span class="fc" id="L73">      throw new ObjectNotFoundException(new OperazioneBean());</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di utilizzare il prelevamento di tutti gli oggetti dell'OperazioneModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return Collezione di Operazioni
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @PostMapping(value = &quot;/operazioni&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public Collection&lt;OperazioneBean&gt; getAllOperazioni(@RequestBody String body) throws
+          SQLException {
+<span class="fc" id="L88">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+
+<span class="fc bfc" id="L90" title="All 2 branches covered.">    if (!jsonObject.toString().equals(&quot;{}&quot;)) {</span>
+<span class="fc" id="L91">      String order = jsonObject.get(&quot;ordineOperazioni&quot;).getAsString();</span>
+<span class="fc" id="L92">      return operazioneModel.doRetrieveAll(order);</span>
+    } else {
+<span class="fc" id="L94">      String order = &quot;&quot;;</span>
+<span class="fc" id="L95">      return operazioneModel.doRetrieveAll(order);</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di utilizzare l'inserimento di una nuova operazione tramite
+   * OperazioneModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ErrorNewObjectException per problemi di creazione di un oggetto
+   */
+  @PostMapping(value = &quot;/newOperazione&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public boolean newOperazione(@RequestBody String body) throws SQLException,
+          ErrorNewObjectException {
+
+<span class="fc" id="L112">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+
+<span class="fc" id="L114">    String tipoOp = jsonObject.get(&quot;newOperazioneTipoOp&quot;).getAsString();</span>
+<span class="fc" id="L115">    String descrizione = jsonObject.get(&quot;newOperazioneDesc&quot;).getAsString();</span>
+
+<span class="fc" id="L117">    Boolean checkTipoOp = tipoOp.matches(&quot;[a-z A-Z]+$&quot;);</span>
+<span class="fc" id="L118">    Boolean checkDesc = descrizione.matches(&quot;[a-z A-Z]+$&quot;);</span>
+<span class="pc bpc" id="L119" title="1 of 4 branches missed.">    if (checkDesc &amp;&amp; checkTipoOp) {</span>
+<span class="fc" id="L120">      operazioneModel.doSave(new OperazioneBean(tipoOp, descrizione));</span>
+<span class="fc" id="L121">      return true;</span>
+    } else {
+<span class="fc" id="L123">      throw new ErrorNewObjectException(new OperazioneBean());</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di utilizzare l'eliminazione di un operazione presente sul DB tramite
+   * OperazioneModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @PostMapping(value = &quot;/deleteOperazione&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public void deleteOperazione(@RequestBody String body) throws SQLException {
+<span class="fc" id="L137">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L138">    String id = jsonObject.get(&quot;idOperazioneRemove&quot;).getAsString();</span>
+<span class="fc" id="L139">    operazioneModel.doDelete(operazioneModel.doRetrieveByKey(Integer.valueOf(id)));</span>
+<span class="fc" id="L140">  }</span>
+
+  /**
+   * Metodo che permette di utilizzare l'aggiornamento di un operazione presente sul DB tramite
+   * OperazioneModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ObjectNotFoundException per problemi di oggetto non trovato
+   * @return conferma/non conferma dell'aggiornamento dell'operazione
+   */
+  @PostMapping(value = &quot;/updateOperazione&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public boolean updateOperazione(@RequestBody String body) throws SQLException,
+          ObjectNotFoundException{
+
+<span class="fc" id="L156">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+
+<span class="fc" id="L158">    String tipoOp = jsonObject.get(&quot;updateOperazioneTipoOp&quot;).getAsString();</span>
+<span class="fc" id="L159">    String descrizione = jsonObject.get(&quot;updateOperazioneDesc&quot;).getAsString();</span>
+<span class="fc" id="L160">    String id = jsonObject.get(&quot;updateOperazioneId&quot;).getAsString();</span>
+
+<span class="fc" id="L162">    OperazioneBean operazioneBean = operazioneModel.doRetrieveByKey(Integer.valueOf(id));</span>
+
+<span class="fc bfc" id="L164" title="All 2 branches covered.">    if (operazioneBean != null) {</span>
+<span class="fc" id="L165">      Boolean checkTipoOp = tipoOp.matches(&quot;[a-z A-Z]+$&quot;);</span>
+<span class="fc" id="L166">      Boolean checkDesc = descrizione.matches(&quot;[a-z A-Z]+$&quot;);</span>
+<span class="pc bpc" id="L167" title="2 of 4 branches missed.">      if (checkDesc &amp;&amp; checkTipoOp) {</span>
+<span class="fc" id="L168">        operazioneBean.setTipoOperazione(tipoOp);</span>
+<span class="fc" id="L169">        operazioneBean.setDescrizione(descrizione);</span>
+<span class="fc" id="L170">        operazioneModel.doUpdate(operazioneBean);</span>
+<span class="fc" id="L171">        return true;</span>
+      } else {
+<span class="nc" id="L173">        return false;</span>
+      }
+    } else {
+<span class="fc" id="L176">      throw new ObjectNotFoundException(new OperazioneBean());</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

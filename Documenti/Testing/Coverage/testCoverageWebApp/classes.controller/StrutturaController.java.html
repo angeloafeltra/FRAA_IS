@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StrutturaController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.controller</a> &gt; <span class="el_source">StrutturaController.java</span></div><h1>StrutturaController.java</h1><pre class="source lang-java linenums">package classes.controller;
+
+import classes.controller.exception.ErrorNewObjectException;
+import classes.controller.exception.InvalidKeyException;
+import classes.controller.exception.ObjectNotFoundException;
+import classes.model.bean.entity.StrutturaBean;
+import classes.model.dao.StrutturaModel;
+import classes.model.interfaces.StrutturaDaoInterface;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.sql.SQLException;
+import java.util.Collection;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+/** Classe per controllare i metodi del Model di Struttura. */
+@RestController
+<span class="fc" id="L20">public class StrutturaController {</span>
+<span class="fc" id="L21">  private final StrutturaDaoInterface strutturaModel = new StrutturaModel();</span>
+
+  /**
+   * Metodo che permette di utilizzare il prelevamento per id dello StrutturaModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return Struttura avente l'id passato
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ObjectNotFoundException per problemi di oggetto non trovato
+   * @throws InvalidKeyException per problemi con la chiave primaria
+   */
+  @PostMapping(value = &quot;/struttura/{id}&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public StrutturaBean getStrutturaById(@RequestBody String body)
+          throws SQLException, ObjectNotFoundException, InvalidKeyException {
+<span class="fc" id="L36">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L37">    String id = jsonObject.get(&quot;idStrutturaGet&quot;).getAsString();</span>
+<span class="fc" id="L38">    StrutturaBean strutturaBean = strutturaModel.doRetrieveByKey(Integer.valueOf(id));</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">    if (Integer.valueOf(id) &gt; 0) {</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">      if (strutturaBean.getNome() != null) {</span>
+<span class="fc" id="L41">        return strutturaBean;</span>
+      } else {
+<span class="nc" id="L43">        throw new ObjectNotFoundException(strutturaBean);</span>
+      }
+    } else {
+<span class="fc" id="L46">      throw new InvalidKeyException(&quot;Id invalido, occorre un id maggiore di 0&quot;);</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di utilizzare il prelevamento per id dello StrutturaModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return Struttura avente l'id passato
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ObjectNotFoundException per problemi di oggetto non trovato
+   */
+  @PostMapping(value = &quot;/struttura/{nome}&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public StrutturaBean getStrutturaByNome(@RequestBody String body)
+          throws SQLException, ObjectNotFoundException {
+<span class="fc" id="L62">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L63">    String nome = jsonObject.get(&quot;nomeStrutturaGet&quot;).getAsString();</span>
+<span class="fc" id="L64">    StrutturaBean strutturaBean = strutturaModel.doRetrieveByName(nome);</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">    if (strutturaBean != null) {</span>
+<span class="fc" id="L66">      return strutturaBean;</span>
+    } else {
+<span class="fc" id="L68">      throw new ObjectNotFoundException(new StrutturaBean());</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di utilizzare il prelevamento di tutti gli oggetti dello StrutturaModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @return Collezione di Strutture
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @PostMapping(value = &quot;/strutture&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public Collection&lt;StrutturaBean&gt; getAllStrutture(@RequestBody String body) throws SQLException {
+<span class="fc" id="L82">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">    if (!body.equals(&quot;{}&quot;)) {</span>
+<span class="fc" id="L84">      String order = jsonObject.get(&quot;ordineStrutture&quot;).getAsString();</span>
+<span class="fc" id="L85">      return strutturaModel.doRetrieveAll(order);</span>
+    } else {
+<span class="fc" id="L87">      String order = &quot;&quot;;</span>
+<span class="fc" id="L88">      return strutturaModel.doRetrieveAll(order);</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di utilizzare l'inserimento di una nuova struttura tramite StrutturaModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ErrorNewObjectException per errori di creazione di un nuovo oggetto
+   * @return conferma/non conferma del salvataggio della struttura
+   */
+  @PostMapping(value = &quot;/newStruttura&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public boolean newStruttura(@RequestBody String body) throws SQLException,
+          ErrorNewObjectException {
+<span class="fc" id="L104">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+
+<span class="fc" id="L106">    String nome = jsonObject.get(&quot;newStrutturaNome&quot;).getAsString();</span>
+<span class="fc" id="L107">    String indirizzo = jsonObject.get(&quot;newStrutturaIndirizzo&quot;).getAsString();</span>
+<span class="fc" id="L108">    String numeroCell = jsonObject.get(&quot;newStrutturaNumeroCell&quot;).getAsString();</span>
+
+<span class="fc" id="L110">    boolean checkNome = nome.matches(&quot;[A-Za-z ]+$&quot;);</span>
+<span class="fc" id="L111">    boolean checkIndirizzo = indirizzo.matches(&quot;^[A-Za-z0-9\\-\\s,\\/]*$&quot;);</span>
+<span class="fc" id="L112">    boolean checkNumeroCell = numeroCell.matches(&quot;^[0-9]{10,12}&quot;);</span>
+
+<span class="pc bpc" id="L114" title="2 of 6 branches missed.">    if (checkIndirizzo &amp;&amp; checkNome &amp;&amp; checkNumeroCell) {</span>
+<span class="fc" id="L115">      strutturaModel.doSave(new StrutturaBean(nome, indirizzo, numeroCell));</span>
+<span class="fc" id="L116">      return true;</span>
+    } else {
+<span class="fc" id="L118">      throw new ErrorNewObjectException(new StrutturaBean());</span>
+    }
+  }
+
+  /**
+   * Metodo che permette di utilizzare l'eliminazione di una struttura presente sul DB tramite
+   * StrutturaModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  @PostMapping(value = &quot;/deleteStruttura&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public void deleteStruttura(@RequestBody String body) throws SQLException {
+<span class="fc" id="L132">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L133">    String id = jsonObject.get(&quot;deleteStrutturaId&quot;).getAsString();</span>
+<span class="fc" id="L134">    strutturaModel.doDelete(strutturaModel.doRetrieveByKey(Integer.valueOf(id)));</span>
+<span class="fc" id="L135">  }</span>
+
+  /**
+   * Metodo che permette di utilizzare l'aggiornamento di una struttura presente sul DB tramite
+   * StrutturaModel.
+   *
+   * @param body corpo della richiesta preso in input
+   * @throws SQLException per problemi di esecuzione della query
+   * @throws ObjectNotFoundException per problemi di oggetto non trovato
+   * @return conferma/non conferma della modifica della struttura
+   */
+  @PostMapping(value = &quot;/updateStruttura&quot;, produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
+  public boolean updateStruttura(@RequestBody String body) throws SQLException {
+<span class="fc" id="L149">    JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();</span>
+<span class="fc" id="L150">    String id = jsonObject.get(&quot;updateStrutturaId&quot;).getAsString();</span>
+<span class="fc" id="L151">    StrutturaBean strutturaBean = strutturaModel.doRetrieveByKey(Integer.valueOf(id));</span>
+<span class="fc" id="L152">    String nome = jsonObject.get(&quot;updateStrutturaNome&quot;).getAsString();</span>
+<span class="fc" id="L153">    String indirizzo = jsonObject.get(&quot;updateStrutturaInd&quot;).getAsString();</span>
+<span class="fc" id="L154">    String numeroCell = jsonObject.get(&quot;updateStrutturaNumeroCell&quot;).getAsString();</span>
+
+<span class="fc bfc" id="L156" title="All 2 branches covered.">    if (strutturaBean != null) {</span>
+<span class="fc" id="L157">      boolean checkNome = nome.matches(&quot;[A-Za-z ]+$&quot;);</span>
+<span class="fc" id="L158">      boolean checkIndirizzo = indirizzo.matches(&quot;^[A-Za-z0-9\\-\\s,\\/]*$&quot;);</span>
+<span class="fc" id="L159">      boolean checkNumeroCell = numeroCell.matches(&quot;^[0-9]{10,12}&quot;);</span>
+
+<span class="pc bpc" id="L161" title="2 of 6 branches missed.">      if (checkIndirizzo &amp;&amp; checkNome &amp;&amp; checkNumeroCell) {</span>
+<span class="fc" id="L162">        strutturaBean.setNumeroDiTelefono(numeroCell);</span>
+<span class="fc" id="L163">        strutturaBean.setNome(nome);</span>
+<span class="fc" id="L164">        strutturaBean.setIndirizzo(indirizzo);</span>
+<span class="fc" id="L165">        strutturaModel.doUpdate(strutturaBean);</span>
+<span class="fc" id="L166">        return true;</span>
+      } else {
+<span class="fc" id="L168">        return false;</span>
+      }
+    } else {
+<span class="fc" id="L171">      throw new ObjectNotFoundException(new StrutturaBean());</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

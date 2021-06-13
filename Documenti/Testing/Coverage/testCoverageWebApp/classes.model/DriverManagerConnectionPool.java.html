@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DriverManagerConnectionPool.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.model</a> &gt; <span class="el_source">DriverManagerConnectionPool.java</span></div><h1>DriverManagerConnectionPool.java</h1><pre class="source lang-java linenums">package classes.model;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * Classe per creare la connessione al DB.
+ */
+public class DriverManagerConnectionPool {
+
+  private static List&lt;Connection&gt; freeDbConnections;
+
+  static {
+<span class="fc" id="L17">    freeDbConnections = new LinkedList&lt;Connection&gt;();</span>
+    try {
+<span class="fc" id="L19">      Class.forName(&quot;com.mysql.jdbc.Driver&quot;);</span>
+<span class="nc" id="L20">    } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L21">      System.out.println(&quot;DB driver not found:&quot; + e.getMessage());</span>
+<span class="fc" id="L22">    }</span>
+<span class="fc" id="L23">  }</span>
+
+  /**
+   * Costruttore per il DriverManagerConnectionPool.
+   */
+<span class="nc" id="L28">  public DriverManagerConnectionPool() {</span>
+<span class="nc" id="L29">    freeDbConnections = new LinkedList&lt;Connection&gt;();</span>
+<span class="nc" id="L30">  }</span>
+
+  /**
+   * Creazione della connessione.
+   *
+   * @return connessione al DB
+   */
+  public static synchronized Connection createDbConnection() {
+    try {
+<span class="fc" id="L39">      Connection newConnection = null;</span>
+<span class="fc" id="L40">      String ip = &quot;localhost&quot;;</span>
+<span class="fc" id="L41">      String port = &quot;3306&quot;;</span>
+<span class="fc" id="L42">      String db =</span>
+          &quot;medqueue?serverTimezone=UTC&amp;useLegacyDatetimeCode=false&amp;&quot;
+                  + &quot;useUnicode=true&amp;useJDBCCompliantTimezoneShift=&quot;
+                  + &quot;true&amp;zeroDateTimeBehavior=convertToNull&amp;autoReconnect=true&amp;useSSL=false&quot;;
+<span class="fc" id="L46">      String username = &quot;root&quot;;</span>
+<span class="fc" id="L47">      String password = &quot;root&quot;;</span>
+      //String password= &quot;kingzoro99&quot;;
+
+<span class="fc" id="L50">      newConnection =</span>
+<span class="fc" id="L51">          DriverManager.getConnection(</span>
+              &quot;jdbc:mysql://&quot; + ip + &quot;:&quot; + port + &quot;/&quot; + db, username, password);
+
+<span class="fc" id="L54">      newConnection.setAutoCommit(true);</span>
+<span class="fc" id="L55">      return newConnection;</span>
+<span class="nc" id="L56">    } catch (Exception e) {</span>
+<span class="nc" id="L57">      e.printStackTrace();</span>
+<span class="nc" id="L58">      return null;</span>
+    }
+  }
+
+  /**
+   * Get per la connessione.
+   *
+   * @return Connessione al DB.
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  public static synchronized Connection getConnection() throws SQLException {
+    Connection connection;
+
+<span class="fc bfc" id="L71" title="All 2 branches covered.">    if (!freeDbConnections.isEmpty()) {</span>
+<span class="fc" id="L72">      connection = freeDbConnections.get(0);</span>
+<span class="fc" id="L73">      freeDbConnections.remove(0);</span>
+
+      try {
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        if (connection.isClosed()) {</span>
+<span class="nc" id="L77">          connection = getConnection();</span>
+        }
+<span class="nc" id="L79">      } catch (SQLException e) {</span>
+<span class="nc" id="L80">        connection.close();</span>
+<span class="nc" id="L81">        connection = getConnection();</span>
+<span class="pc" id="L82">      }</span>
+    } else {
+<span class="fc" id="L84">      connection = createDbConnection();</span>
+    }
+
+<span class="fc" id="L87">    return connection;</span>
+  }
+
+  /**
+   * Chiusura di una connessione.
+   *
+   * @param connection connessione da chiudere
+   * @throws SQLException per problemi di esecuzione della query
+   */
+  public static synchronized void releaseConnection(Connection connection) throws SQLException {
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">    if (connection != null) {</span>
+<span class="fc" id="L98">      freeDbConnections.add(connection);</span>
+    }
+<span class="fc" id="L100">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="it"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OperazioneDaoTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">demo$TestAll.exec</a> &gt; <a href="index.source.html" class="el_package">classes.model.interfaces</a> &gt; <span class="el_source">OperazioneDaoTest.java</span></div><h1>OperazioneDaoTest.java</h1><pre class="source lang-java linenums">package classes.model.interfaces;
+
+import classes.controller.exception.ObjectNotFoundException;
+import classes.model.bean.entity.OperazioneBean;
+import classes.model.dao.OperazioneModel;
+import org.junit.jupiter.api.Test;
+
+import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+<span class="fc" id="L12">class OperazioneDaoTest {</span>
+<span class="fc" id="L13">    private OperazioneModel operazioneModel = new OperazioneModel();</span>
+
+    @Test
+    void doRetrieveByKey() throws SQLException {
+<span class="fc" id="L17">        assertNotNull(operazioneModel.doRetrieveByKey(1));</span>
+<span class="fc" id="L18">    }</span>
+
+    @Test
+    void doRetrieveByTipo() throws SQLException {
+<span class="fc" id="L22">        assertNotNull(operazioneModel.doRetrieveByTipo(&quot;Pagamento Ticket&quot;));</span>
+<span class="fc" id="L23">        assertNull(operazioneModel.doRetrieveByTipo(&quot;Tipo errato&quot;));</span>
+<span class="fc" id="L24">    }</span>
+
+    @Test
+    void doRetrieveAll() throws SQLException {
+<span class="fc" id="L28">        assertNotNull(operazioneModel.doRetrieveAll(&quot;&quot;));</span>
+<span class="fc" id="L29">    }</span>
+
+    @Test
+    void doSave() throws SQLException {
+<span class="fc" id="L33">        OperazioneBean operazioneBean = new OperazioneBean(&quot;Prova&quot;, &quot;Inserita operazine di prova&quot;);</span>
+<span class="fc" id="L34">        operazioneModel.doSave(operazioneBean);</span>
+<span class="fc" id="L35">    }</span>
+
+    @Test
+    void doUpdate() throws SQLException {
+<span class="fc" id="L39">        OperazioneBean operazioneBean = operazioneModel.doRetrieveByTipo(&quot;Prova&quot;);</span>
+<span class="fc" id="L40">        operazioneBean.setTipoOperazione(&quot;ProvaModifica&quot;);</span>
+<span class="fc" id="L41">        operazioneModel.doUpdate(operazioneBean);</span>
+<span class="fc" id="L42">    }</span>
+
+    @Test
+    void doDelete() throws SQLException {
+<span class="fc" id="L46">        OperazioneBean operazioneBean = operazioneModel.doRetrieveByTipo(&quot;Da Rimuovere Dao&quot;);</span>
+<span class="fc" id="L47">        operazioneModel.doDelete(operazioneBean);</span>
+<span class="fc" id="L48">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
